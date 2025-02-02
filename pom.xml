@@ -12,7 +12,7 @@
     <artifactId>mercadoapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>mercadoapi</name>
-    <description>API de mercado para portfólio, com a parte de cliente com pedidos, e de administração.</description>
+    <description>API de mercado para portfólio, com a parte de usuario com pedidos, e de administração.</description>
     <url/>
     <licenses>
         <license/>

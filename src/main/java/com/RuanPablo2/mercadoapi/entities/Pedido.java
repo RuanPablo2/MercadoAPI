@@ -20,8 +20,8 @@ public class Pedido {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     private LocalDateTime dataCriacao;
 
@@ -35,8 +35,8 @@ public class Pedido {
         this.dataCriacao = LocalDateTime.now();
     }
 
-    public Pedido(Cliente cliente, LocalDateTime dataCriacao, StatusPedido status, List<ItemPedido> itens) {
-        this.cliente = cliente;
+    public Pedido(Usuario usuario, LocalDateTime dataCriacao, StatusPedido status, List<ItemPedido> itens) {
+        this.usuario = usuario;
         this.dataCriacao = dataCriacao;
         this.status = status;
         this.itens = itens;
