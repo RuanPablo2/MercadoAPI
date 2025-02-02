@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
@@ -21,4 +20,12 @@ public class Cliente {
     private String senha;
     private String endereco;
     private String telefone;
+
+    public Cliente(String nome, String email, String senha, String endereco, String telefone) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.endereco = endereco;
+        this.telefone = telefone;
+    }
 }

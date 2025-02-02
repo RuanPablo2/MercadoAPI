@@ -3,8 +3,9 @@ package com.RuanPablo2.mercadoapi.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
@@ -17,8 +18,17 @@ public class Produto {
     private Long id;
     private String nome;
     private String descricao;
-    private Double preco;
+    private BigDecimal preco;
     private Integer quantidadeEstoque;
     private String categoria;
     private String imagem;
+
+    public Produto(String nome, String descricao, BigDecimal preco, Integer quantidadeEstoque, String categoria, String imagem) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.quantidadeEstoque = quantidadeEstoque;
+        this.categoria = categoria;
+        this.imagem = imagem;
+    }
 }
