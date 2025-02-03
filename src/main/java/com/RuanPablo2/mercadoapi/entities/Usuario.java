@@ -19,13 +19,16 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
-    private String endereco;
     private String telefone;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public Usuario(String nome, String email, String senha, String endereco, String telefone, Role role) {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "endereco_id")
+    private Endereco endereco;
+
+    public Usuario(String nome, String email, String senha, Endereco endereco, String telefone, Role role) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
