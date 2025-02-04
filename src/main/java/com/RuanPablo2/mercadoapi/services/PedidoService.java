@@ -1,5 +1,6 @@
 package com.RuanPablo2.mercadoapi.services;
 
+import com.RuanPablo2.mercadoapi.dtos.ItemPedidoDTO;
 import com.RuanPablo2.mercadoapi.dtos.PedidoDTO;
 import com.RuanPablo2.mercadoapi.entities.ItemPedido;
 import com.RuanPablo2.mercadoapi.entities.Pedido;
@@ -67,6 +68,29 @@ public class PedidoService {
         // Atualiza o status para CANCELADO
         pedido.setStatus(StatusPedido.CANCELADO);
         pedido = pedidoRepository.save(pedido);
+        return new PedidoDTO(pedido);
+    }
+
+    @Transactional
+    public PedidoDTO adicionarItemAoPedido(Long pedidoId, ItemPedidoDTO itemPedidoDTO) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        // Busca o produto pelo ID fornecido no itemPedidoDTO
+        Produto produto = produtoRepository.findById(itemPedidoDTO.getProdutoId())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        // Cria um novo item de pedido
+        ItemPedido novoItem = new ItemPedido(pedido, produto, itemPedidoDTO.getQuantidade(), produto.getPreco());
+
+        // Adicione o novo item à lista de itens do pedido
+        pedido.getItens().add(novoItem);
+
+        pedido.getTotal();
+
+        pedido = pedidoRepository.save(pedido);
+
+        // Retorne o DTO atualizado do pedido
         return new PedidoDTO(pedido);
     }
 }
