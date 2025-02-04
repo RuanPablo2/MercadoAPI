@@ -1,5 +1,6 @@
 package com.RuanPablo2.mercadoapi.entities;
 
+import com.RuanPablo2.mercadoapi.dtos.ProdutoDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,5 +31,19 @@ public class Produto {
         this.quantidadeEstoque = quantidadeEstoque;
         this.categoria = categoria;
         this.imagem = imagem;
+    }
+
+    public Produto(ProdutoDTO dto) {
+        this.nome = dto.getNome();
+        this.descricao = dto.getDescricao();
+        this.preco = dto.getPreco();
+        this.quantidadeEstoque = dto.getQuantidadeEstoque();
+    }
+
+    public void atualizarDados(ProdutoDTO dto) {
+        this.nome = dto.getNome();
+        this.descricao = dto.getDescricao();
+        this.preco = dto.getPreco();
+        this.quantidadeEstoque = dto.getQuantidadeEstoque();
     }
 }

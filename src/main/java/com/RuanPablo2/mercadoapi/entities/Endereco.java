@@ -1,5 +1,6 @@
 package com.RuanPablo2.mercadoapi.entities;
 
+import com.RuanPablo2.mercadoapi.dtos.EnderecoDTO;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,5 +39,15 @@ public class Endereco {
         this.estado = estado;
         this.cep = cep;
         this.usuario = usuario;
+    }
+
+    public Endereco(EnderecoDTO dto) {
+        this.rua = dto.getRua();
+        this.numero = dto.getNumero();
+        this.complemento = dto.getComplemento();
+        this.bairro = dto.getBairro();
+        this.cidade = dto.getCidade();
+        this.estado = dto.getEstado();
+        this.cep = dto.getCep();
     }
 }

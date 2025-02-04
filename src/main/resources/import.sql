@@ -1,14 +1,28 @@
+-- ENDEREÇOS
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Rua Principal', '100', 'Apto 101', 'Centro', 'São Paulo', 'SP', '01000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Rua A', '123', 'Casa 1', 'Jardim das Flores', 'Rio de Janeiro', 'RJ', '20000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Avenida B', '456', '', 'Centro', 'Belo Horizonte', 'MG', '30000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Rua C', '789', 'Casa 2', 'Vila Nova', 'Curitiba', 'PR', '40000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Travessa D', '321', '', 'São João', 'Porto Alegre', 'RS', '50000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Praça E', '654', 'Loja 3', 'Shopping Center', 'Fortaleza', 'CE', '60000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Rua F', '987', 'Apto 202', 'Vila Verde', 'Salvador', 'BA', '70000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Avenida G', '147', '', 'Jardim das Palmeiras', 'Recife', 'PE', '80000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Rua H', '258', 'Sala 101', 'Vila Nova', 'Manaus', 'AM', '90000-000');
+INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) VALUES ('Alameda I', '369', '', 'Parque Industrial', 'São Luís', 'MA', '92000-000');
+
+
 -- USUÁRIOS (Clientes e Administradores)
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Admin', 'admin@email.com', 'admin123', 'Rua Principal, 100', '11999999999', 'ADMIN');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('João Silva', 'joao@email.com', '123456', 'Rua A, 123', '11987654321', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Maria Souza', 'maria@email.com', '654321', 'Avenida B, 456', '11876543210', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Carlos Mendes', 'carlos@email.com', 'car123', 'Rua C, 789', '11765432109', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Ana Pereira', 'ana@email.com', 'ana456', 'Travessa D, 321', '11654321098', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Paulo Henrique', 'paulo@email.com', 'paulo789', 'Praça E, 654', '11543210987', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Fernanda Lima', 'fernanda@email.com', 'fernanda123', 'Rua F, 987', '11432109876', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Ricardo Alves', 'ricardo@email.com', 'ricardo456', 'Avenida G, 147', '11321098765', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Juliana Castro', 'juliana@email.com', 'juliana789', 'Rua H, 258', '11210987654', 'CLIENTE');
-INSERT INTO tb_usuario (nome, email, senha, endereco, telefone, role) VALUES ('Gabriel Martins', 'gabriel@email.com', 'gabriel987', 'Alameda I, 369', '11109876543', 'CLIENTE');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Admin', 'admin@email.com', 'admin123', 1, '11999999999', 'ADMIN', '12345678900');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('João Silva', 'joao@email.com', '123456', 2, '11987654321', 'CLIENTE', '98765432100');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Maria Souza', 'maria@email.com', '654321', 3, '11876543210', 'CLIENTE', '98765432101');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Carlos Mendes', 'carlos@email.com', 'car123', 4, '11765432109', 'CLIENTE', '98765432102');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Ana Pereira', 'ana@email.com', 'ana456', 5, '11654321098', 'CLIENTE', '98765432103');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Paulo Henrique', 'paulo@email.com', 'paulo789', 6, '11543210987', 'CLIENTE', '98765432104');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Fernanda Lima', 'fernanda@email.com', 'fernanda123', 7, '11432109876', 'CLIENTE', '98765432105');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Ricardo Alves', 'ricardo@email.com', 'ricardo456', 8, '11321098765', 'CLIENTE', '98765432106');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Juliana Castro', 'juliana@email.com', 'juliana789', 9, '11210987654', 'CLIENTE', '98765432107');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Gabriel Martins', 'gabriel@email.com', 'gabriel987', 10, '11109876543', 'CLIENTE', '98765432108');
+
 
 -- PRODUTOS
 INSERT INTO tb_produto (nome, descricao, preco, quantidade_estoque, categoria, imagem) VALUES ('Arroz', 'Pacote de 5kg', 25.90, 50, 'Alimentos', 'img1.jpg');

@@ -35,9 +35,8 @@ public class Pedido {
         this.dataCriacao = LocalDateTime.now();
     }
 
-    public Pedido(Usuario usuario, LocalDateTime dataCriacao, StatusPedido status, List<ItemPedido> itens) {
+    public Pedido(Usuario usuario, StatusPedido status, List<ItemPedido> itens) {
         this.usuario = usuario;
-        this.dataCriacao = dataCriacao;
         this.status = status;
         this.itens = itens;
     }

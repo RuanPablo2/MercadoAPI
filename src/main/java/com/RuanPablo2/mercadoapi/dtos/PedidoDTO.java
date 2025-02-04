@@ -1,6 +1,7 @@
 package com.RuanPablo2.mercadoapi.dtos;
 
 import com.RuanPablo2.mercadoapi.entities.Pedido;
+import com.RuanPablo2.mercadoapi.entities.enums.StatusPedido;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class PedidoDTO {
     private BigDecimal total;
 
     @NotNull(message = "O status do pedido é obrigatório")
-    private String status;
+    private StatusPedido status;
 
     @NotNull(message = "O endereço de entrega é obrigatório")
     private EnderecoDTO enderecoEntrega;
@@ -36,7 +37,7 @@ public class PedidoDTO {
         usuarioId = entity.getUsuario().getId();
         itens = entity.getItens().stream().map(ItemPedidoDTO::new).toList();
         total = entity.getTotal();
-        status = entity.getStatus().name(); // enum para String
+        status = entity.getStatus(); // enum para String
 
         // Se o usuário tiver um endereço cadastrado, ele é usado como padrão
         if (entity.getUsuario().getEndereco() != null) {
