@@ -1,13 +1,16 @@
 package com.RuanPablo2.mercadoapi.services;
 
+import com.RuanPablo2.mercadoapi.dtos.ProdutoDTO;
 import com.RuanPablo2.mercadoapi.dtos.UsuarioCadastroDTO;
 import com.RuanPablo2.mercadoapi.dtos.UsuarioDTO;
+import com.RuanPablo2.mercadoapi.entities.Produto;
 import com.RuanPablo2.mercadoapi.entities.Usuario;
 import com.RuanPablo2.mercadoapi.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +27,16 @@ public class UsuarioService {
         Usuario usuario = new Usuario(dto);
         usuario = usuarioRepository.save(usuario);
         return new UsuarioDTO(usuario);
+    }
+
+    public List<UsuarioDTO> findAll(){
+        List<Usuario> result = usuarioRepository.findAll();
+        return result.stream().map(x -> new UsuarioDTO(x)).toList();
+    }
+
+    public UsuarioDTO findById(Long id){
+        Usuario result = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));;
+        return new UsuarioDTO(result);
     }
 
     public Optional<Usuario> findByEmail(String email) {

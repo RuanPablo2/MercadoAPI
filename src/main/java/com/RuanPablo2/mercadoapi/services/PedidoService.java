@@ -36,7 +36,7 @@ public class PedidoService {
     }
 
     @Transactional
-    public PedidoDTO cadastrarPedido(PedidoDTO pedidoDTO) {
+    public PedidoDTO save(PedidoDTO pedidoDTO) {
         Usuario usuario = usuarioRepository.findById(pedidoDTO.getUsuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -56,7 +56,28 @@ public class PedidoService {
     }
 
     @Transactional
-    public PedidoDTO cancelarPedido(Long id) {
+    public List<PedidoDTO> findAll() {
+        return pedidoRepository.findAll().stream().map(PedidoDTO::new).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PedidoDTO findById(Long id) {
+        Pedido pedido = pedidoRepository.findById(id).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        return new PedidoDTO(pedido);
+    }
+
+    @Transactional
+    public PedidoDTO update(Long id, PedidoDTO dto) {
+        Pedido pedido = pedidoRepository.findById(id).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        pedido.setStatus(dto.getStatus());
+
+        pedido = pedidoRepository.save(pedido);
+        return new PedidoDTO(pedido);
+    }
+
+    @Transactional
+    public PedidoDTO delete(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
@@ -91,6 +112,22 @@ public class PedidoService {
         pedido = pedidoRepository.save(pedido);
 
         // Retorne o DTO atualizado do pedido
+        return new PedidoDTO(pedido);
+    }
+
+    @Transactional
+    public PedidoDTO removerItemDoPedido(Long pedidoId, Long itemId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        // Verifica se o item pertence ao pedido
+        boolean removed = pedido.getItens().removeIf(item -> item.getId().equals(itemId));
+
+        if (!removed) {
+            throw new RuntimeException("Item do pedido não encontrado no pedido especificado");
+        }
+
+        pedido = pedidoRepository.save(pedido);
+
         return new PedidoDTO(pedido);
     }
 }
