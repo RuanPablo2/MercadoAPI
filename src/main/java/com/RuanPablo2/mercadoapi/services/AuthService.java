@@ -38,7 +38,7 @@ public class AuthService {
             LoginResponseDTO response = new LoginResponseDTO();
             response.setToken(jwt);
             response.setUsuarioId(userDetails.getId());
-            response.setNome(userDetails.getUsername());
+            response.setNome(userDetails.getNome());
             response.setEmail(userDetails.getEmail());
 
             return response;
@@ -47,11 +47,11 @@ public class AuthService {
         }
     }
 
-    public UsuarioDTO register(UsuarioCadastroDTO usuarioCadastroDTO) {
+    public UsuarioDTO register(UsuarioCadastroDTO usuarioCadastroDTO, boolean isAdminCreating) {
         if (usuarioService.findByEmail(usuarioCadastroDTO.getEmail()).isPresent()) {
             throw new RuntimeException("E-mail já cadastrado");
         }
 
-        return usuarioService.save(usuarioCadastroDTO);
+        return usuarioService.save(usuarioCadastroDTO, isAdminCreating);
     }
 }

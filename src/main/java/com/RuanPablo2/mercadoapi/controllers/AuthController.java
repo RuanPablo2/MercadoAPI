@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UsuarioDTO> register(@RequestBody @Valid UsuarioCadastroDTO usuarioCadastroDTO) {
         try {
-            UsuarioDTO savedUser = authService.register(usuarioCadastroDTO);
+            UsuarioDTO savedUser = authService.register(usuarioCadastroDTO, false);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

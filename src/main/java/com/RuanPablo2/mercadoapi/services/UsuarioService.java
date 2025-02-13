@@ -1,12 +1,12 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.ProdutoDTO;
 import com.RuanPablo2.mercadoapi.dtos.UsuarioCadastroDTO;
 import com.RuanPablo2.mercadoapi.dtos.UsuarioDTO;
-import com.RuanPablo2.mercadoapi.entities.Produto;
 import com.RuanPablo2.mercadoapi.entities.Usuario;
+import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import com.RuanPablo2.mercadoapi.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +19,29 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
-    public UsuarioDTO save(UsuarioCadastroDTO dto) {
+    public UsuarioDTO save(UsuarioCadastroDTO dto, boolean isAdminCreating) {
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("E-mail já cadastrado");
         }
+
+        Role role;
+        if (isAdminCreating) {
+            role = Role.ADMIN;
+        } else {
+            role = Role.CLIENTE;
+        }
+
+        dto.setSenha(passwordEncoder.encode(dto.getSenha()));
+
         Usuario usuario = new Usuario(dto);
+        usuario.setRole(role);
+
         usuario = usuarioRepository.save(usuario);
+
         return new UsuarioDTO(usuario);
     }
 

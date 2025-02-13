@@ -7,17 +7,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
 
     private Long id;
+    private String nome;
     private String email;
     private String senha;
     private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Usuario usuario) {
         this.id = usuario.getId();
+        this.nome = usuario.getNome();
         this.email = usuario.getEmail();
         this.senha = usuario.getSenha();
         this.authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().toString()));
@@ -60,6 +61,10 @@ public class CustomUserDetails implements UserDetails {
 
     public Long getId() {
         return id;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public String getEmail() {
