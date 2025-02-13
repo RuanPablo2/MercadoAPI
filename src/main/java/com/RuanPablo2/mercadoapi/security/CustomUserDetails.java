@@ -1,6 +1,7 @@
 package com.RuanPablo2.mercadoapi.security;
 
 import com.RuanPablo2.mercadoapi.entities.Usuario;
+import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ public class CustomUserDetails implements UserDetails {
     private String nome;
     private String email;
     private String senha;
+    private Role role;
     private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Usuario usuario) {
@@ -21,7 +23,8 @@ public class CustomUserDetails implements UserDetails {
         this.nome = usuario.getNome();
         this.email = usuario.getEmail();
         this.senha = usuario.getSenha();
-        this.authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().toString()));
+        this.role = usuario.getRole();
+        this.authorities = Arrays.asList(new SimpleGrantedAuthority(usuario.getRole().toString()));
     }
 
     @Override
@@ -69,5 +72,8 @@ public class CustomUserDetails implements UserDetails {
 
     public String getEmail() {
         return email;
+    }
+    public Role getRole() {
+        return role;
     }
 }

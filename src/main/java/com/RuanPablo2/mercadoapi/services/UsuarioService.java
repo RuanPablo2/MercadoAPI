@@ -30,9 +30,9 @@ public class UsuarioService {
 
         Role role;
         if (isAdminCreating) {
-            role = Role.ADMIN;
+            role = Role.ROLE_ADMIN;
         } else {
-            role = Role.CLIENTE;
+            role = Role.ROLE_CLIENTE;
         }
 
         dto.setSenha(passwordEncoder.encode(dto.getSenha()));

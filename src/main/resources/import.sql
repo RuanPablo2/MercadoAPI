@@ -12,16 +12,16 @@ INSERT INTO tb_endereco (rua, numero, complemento, bairro, cidade, estado, cep) 
 
 
 -- USUÁRIOS (Clientes e Administradores)
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Admin', 'admin@email.com', '$2a$10$m8G9wa0BU6zP.7kyjSxLKOjxJ2dF/Wb.xZb.ck.C4ncad/Lly3fBu', 1, '11999999999', 'ADMIN', '12345678900');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('João Silva', 'joao@email.com', '$2a$10$S4YimPUn4lgi27En.Qf42..JQGtOIFsgCACVCX5XhxuKn/buYkiOa', 2, '11987654321', 'CLIENTE', '98765432100');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Maria Souza', 'maria@email.com', '$2a$10$fqNvBUOfIKPEQgxxzB42M.d30kCcOJCKMNIAznqfY5.NvVXR65DrC', 3, '11876543210', 'CLIENTE', '98765432101');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Carlos Mendes', 'carlos@email.com', '$2a$10$w7C3Vdilmdz7zgm8w53D9eWnuviVVo8D/7oM.5o7oHkeWi8Vq8esy', 4, '11765432109', 'CLIENTE', '98765432102');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Ana Pereira', 'ana@email.com', '$2a$10$XLDaaN3D5tyPfG6lnwNMXOuecvUlugHaWkVTU46jxP0aRZ8nY6eDa', 5, '11654321098', 'CLIENTE', '98765432103');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Paulo Henrique', 'paulo@email.com', '$2a$10$29WQnom0LLQUX9uKEMetf.n0cbWMu82WqpfSFdhitAW2LucS0VWz6', 6, '11543210987', 'CLIENTE', '98765432104');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Fernanda Lima', 'fernanda@email.com', '$2a$10$2lMoUUcLQbquVs1fv3h.x.2UKpx41qJ0r8OXjC.4QO1H1HYtxs6k2', 7, '11432109876', 'CLIENTE', '98765432105');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Ricardo Alves', 'ricardo@email.com', '$2a$10$yHbO1AulA1B5bdXvLEl8qu051lUUssqtdVcD8Ck.FC0//lX9Jeu82', 8, '11321098765', 'CLIENTE', '98765432106');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Juliana Castro', 'juliana@email.com', '$2a$10$VEzhIKmiSTZONxK3B21SHuBJUO37xDlOZI9vnpB1st7aQLwNq15JK', 9, '11210987654', 'CLIENTE', '98765432107');
-INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Gabriel Martins', 'gabriel@email.com', '$2a$10$tgbYMrV8zDsEgOrFFDQAU.WIVqF7VevitEHfp6VnkorcroZaJTSU6', 10, '11109876543', 'CLIENTE', '98765432108');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Admin', 'admin@email.com', '$2a$10$m8G9wa0BU6zP.7kyjSxLKOjxJ2dF/Wb.xZb.ck.C4ncad/Lly3fBu', 1, '11999999999', 'ROLE_ADMIN', '12345678900');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('João Silva', 'joao@email.com', '$2a$10$S4YimPUn4lgi27En.Qf42..JQGtOIFsgCACVCX5XhxuKn/buYkiOa', 2, '11987654321', 'ROLE_CLIENTE', '98765432100');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Maria Souza', 'maria@email.com', '$2a$10$fqNvBUOfIKPEQgxxzB42M.d30kCcOJCKMNIAznqfY5.NvVXR65DrC', 3, '11876543210', 'ROLE_CLIENTE', '98765432101');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Carlos Mendes', 'carlos@email.com', '$2a$10$w7C3Vdilmdz7zgm8w53D9eWnuviVVo8D/7oM.5o7oHkeWi8Vq8esy', 4, '11765432109', 'ROLE_CLIENTE', '98765432102');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Ana Pereira', 'ana@email.com', '$2a$10$XLDaaN3D5tyPfG6lnwNMXOuecvUlugHaWkVTU46jxP0aRZ8nY6eDa', 5, '11654321098', 'ROLE_CLIENTE', '98765432103');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Paulo Henrique', 'paulo@email.com', '$2a$10$29WQnom0LLQUX9uKEMetf.n0cbWMu82WqpfSFdhitAW2LucS0VWz6', 6, '11543210987', 'ROLE_CLIENTE', '98765432104');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Fernanda Lima', 'fernanda@email.com', '$2a$10$2lMoUUcLQbquVs1fv3h.x.2UKpx41qJ0r8OXjC.4QO1H1HYtxs6k2', 7, '11432109876', 'ROLE_CLIENTE', '98765432105');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Ricardo Alves', 'ricardo@email.com', '$2a$10$yHbO1AulA1B5bdXvLEl8qu051lUUssqtdVcD8Ck.FC0//lX9Jeu82', 8, '11321098765', 'ROLE_CLIENTE', '98765432106');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Juliana Castro', 'juliana@email.com', '$2a$10$VEzhIKmiSTZONxK3B21SHuBJUO37xDlOZI9vnpB1st7aQLwNq15JK', 9, '11210987654', 'ROLE_CLIENTE', '98765432107');
+INSERT INTO tb_usuario (nome, email, senha, endereco_id, telefone, role, cpf) VALUES ('Gabriel Martins', 'gabriel@email.com', '$2a$10$tgbYMrV8zDsEgOrFFDQAU.WIVqF7VevitEHfp6VnkorcroZaJTSU6', 10, '11109876543', 'ROLE_CLIENTE', '98765432108');
 --SENHAS
 --admin123
 --123456

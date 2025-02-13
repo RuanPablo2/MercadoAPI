@@ -33,7 +33,7 @@ public class AuthService {
 
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            String jwt = jwtUtil.generateToken(userDetails.getEmail(), userDetails.getRole().toString());
 
             LoginResponseDTO response = new LoginResponseDTO();
             response.setToken(jwt);
