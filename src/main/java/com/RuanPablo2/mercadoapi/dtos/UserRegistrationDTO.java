@@ -10,10 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UsuarioCadastroDTO {
+public class UserRegistrationDTO {
 
     @NotBlank(message = "Nome é obrigatório")
-    private String nome;
+    private String name;
 
     @NotBlank(message = "E-mail é obrigatório")
     @Email(message = "E-mail inválido")
@@ -21,23 +21,23 @@ public class UsuarioCadastroDTO {
 
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    private String senha;
+    private String password;
 
     @NotBlank(message = "Telefone é obrigatório")
-    private String telefone;
+    private String phoneNumber;
 
     @NotBlank(message = "CPF é obrigatório")
     @Size(min = 11, max = 11, message = "CPF deve ter 11 dígitos")
     private String cpf;
 
-    private EnderecoDTO endereco;
+    private AddressDTO address;
 
-    public UsuarioCadastroDTO(String nome, String email, String senha, String telefone, EnderecoDTO endereco) {
-        this.nome = nome;
+    public UserRegistrationDTO(String name, String email, String password, String phoneNumber, String cpf, AddressDTO address) {
+        this.name = name;
         this.email = email;
-        this.senha = senha;
-        this.telefone = telefone;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
         this.cpf = cpf;
-        this.endereco = endereco;
+        this.address = address;
     }
 }

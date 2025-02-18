@@ -1,6 +1,6 @@
 package com.RuanPablo2.mercadoapi.security;
 
-import com.RuanPablo2.mercadoapi.entities.Usuario;
+import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,19 +12,19 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
 
     private Long id;
-    private String nome;
+    private String name;
     private String email;
-    private String senha;
+    private String password;
     private Role role;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(Usuario usuario) {
-        this.id = usuario.getId();
-        this.nome = usuario.getNome();
-        this.email = usuario.getEmail();
-        this.senha = usuario.getSenha();
-        this.role = usuario.getRole();
-        this.authorities = Arrays.asList(new SimpleGrantedAuthority(usuario.getRole().toString()));
+    public CustomUserDetails(User user) {
+        this.id = user.getId();
+        this.name = user.getName();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.role = user.getRole();
+        this.authorities = Arrays.asList(new SimpleGrantedAuthority(user.getRole().toString()));
     }
 
     @Override
@@ -34,7 +34,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return senha;
+        return password;
     }
 
     @Override
@@ -66,8 +66,8 @@ public class CustomUserDetails implements UserDetails {
         return id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {

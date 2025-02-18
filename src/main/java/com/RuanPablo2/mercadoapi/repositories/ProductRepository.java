@@ -1,13 +1,13 @@
 package com.RuanPablo2.mercadoapi.repositories;
 
-import com.RuanPablo2.mercadoapi.entities.Produto;
+import com.RuanPablo2.mercadoapi.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    List<Produto> findByCategoria(String categoria);
+    List<Product> findByCategory(String category);
 }

@@ -2,8 +2,8 @@ package com.RuanPablo2.mercadoapi.services;
 
 import com.RuanPablo2.mercadoapi.dtos.LoginRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.LoginResponseDTO;
-import com.RuanPablo2.mercadoapi.dtos.UsuarioCadastroDTO;
-import com.RuanPablo2.mercadoapi.dtos.UsuarioDTO;
+import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.dtos.UserDTO;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UserService userService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -28,7 +28,7 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getSenha())
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
 
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -37,8 +37,8 @@ public class AuthService {
 
             LoginResponseDTO response = new LoginResponseDTO();
             response.setToken(jwt);
-            response.setUsuarioId(userDetails.getId());
-            response.setNome(userDetails.getNome());
+            response.setUserId(userDetails.getId());
+            response.setName(userDetails.getName());
             response.setEmail(userDetails.getEmail());
 
             return response;
@@ -47,11 +47,11 @@ public class AuthService {
         }
     }
 
-    public UsuarioDTO register(UsuarioCadastroDTO usuarioCadastroDTO, boolean isAdminCreating) {
-        if (usuarioService.findByEmail(usuarioCadastroDTO.getEmail()).isPresent()) {
+    public UserDTO register(UserRegistrationDTO userRegistrationDTO, boolean isAdminCreating) {
+        if (userService.findByEmail(userRegistrationDTO.getEmail()).isPresent()) {
             throw new RuntimeException("E-mail já cadastrado");
         }
 
-        return usuarioService.save(usuarioCadastroDTO, isAdminCreating);
+        return userService.save(userRegistrationDTO, isAdminCreating);
     }
 }
