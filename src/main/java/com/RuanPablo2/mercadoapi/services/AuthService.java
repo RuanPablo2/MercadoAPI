@@ -2,8 +2,9 @@ package com.RuanPablo2.mercadoapi.services;
 
 import com.RuanPablo2.mercadoapi.dtos.LoginRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.LoginResponseDTO;
-import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.dtos.UserDTO;
+import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class AuthService {
 
     public UserDTO register(UserRegistrationDTO userRegistrationDTO, boolean isAdminCreating) {
         if (userService.findByEmail(userRegistrationDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("E-mail já cadastrado");
+            throw new BusinessException("Email already registered", "USR-001");
         }
 
         return userService.save(userRegistrationDTO, isAdminCreating);

@@ -34,11 +34,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@RequestBody @Valid UserRegistrationDTO userRegistrationDTO) {
-        try {
             UserDTO savedUser = authService.register(userRegistrationDTO, false);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
     }
 }

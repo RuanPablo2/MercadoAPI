@@ -7,6 +7,8 @@ import com.RuanPablo2.mercadoapi.entities.Order;
 import com.RuanPablo2.mercadoapi.entities.Product;
 import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
+import com.RuanPablo2.mercadoapi.exception.BusinessException;
+import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.OrderRepository;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
@@ -38,12 +40,12 @@ public class OrderService {
     @Transactional
     public OrderDTO save(OrderDTO orderDTO) {
         User user = userRepository.findById(orderDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
 
         List<OrderItem> orderItem = orderDTO.getItems().stream()
                 .map(itemDto -> {
                     Product product = productRepository.findById(itemDto.getProductId())
-                            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                            .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
 
                     return new OrderItem(null, product, itemDto.getQuantity(), product.getPrice());
                 }).collect(Collectors.toList());
@@ -62,13 +64,13 @@ public class OrderService {
 
     @Transactional
     public OrderDTO findById(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
         return new OrderDTO(order);
     }
 
     @Transactional
     public OrderDTO update(Long id, OrderDTO dto) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         order.setStatus(dto.getStatus());
 
@@ -79,11 +81,11 @@ public class OrderService {
     @Transactional
     public OrderDTO delete(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         // Verifica se o pedido já não está cancelado
         if (order.getStatus() == OrderStatus.CANCELED) {
-            throw new RuntimeException("Este pedido já foi cancelado.");
+            throw new BusinessException("This order has already been canceled.", "ORD-003");
         }
 
         // Atualiza o status para CANCELED
@@ -95,16 +97,16 @@ public class OrderService {
     @Transactional
     public OrderDTO addOrderItem(Long pedidoId, OrderItemDTO orderItemDTO) {
         Order order = orderRepository.findById(pedidoId)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         // Busca o product pelo ID fornecido no orderItemDTO
         Product product = productRepository.findById(orderItemDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
 
         // Cria um novo item de order
         OrderItem novoItem = new OrderItem(order, product, orderItemDTO.getQuantity(), product.getPrice());
 
-        // Adicione o novo item à lista de itens do order
+        // Adicione o novo item à lista de itens do pedido
         order.getItems().add(novoItem);
 
         order.getTotal();
@@ -117,13 +119,13 @@ public class OrderService {
 
     @Transactional
     public OrderDTO deleteOrderItem(Long pedidoId, Long itemId) {
-        Order order = orderRepository.findById(pedidoId).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        Order order = orderRepository.findById(pedidoId).orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         // Verifica se o item pertence ao order
         boolean removed = order.getItems().removeIf(item -> item.getId().equals(itemId));
 
         if (!removed) {
-            throw new RuntimeException("Item do pedido não encontrado no order especificado");
+            throw new BusinessException("Order item not found in the specified order", "ORD-005");
         }
 
         order = orderRepository.save(order);

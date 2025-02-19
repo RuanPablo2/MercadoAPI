@@ -4,6 +4,8 @@ import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.dtos.UserDTO;
 import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
+import com.RuanPablo2.mercadoapi.exception.BusinessException;
+import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +27,11 @@ public class UserService {
     @Transactional
     public UserDTO save(UserRegistrationDTO dto, boolean isAdminCreating) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("E-mail já cadastrado");
+            throw new BusinessException("Email already registered", "USR-001");
+        }
+
+        if (userRepository.existsByCpf(dto.getCpf())) {
+            throw new BusinessException("CPF already registered", "USR-002");
         }
 
         Role role;
@@ -51,7 +57,7 @@ public class UserService {
     }
 
     public UserDTO findById(Long id){
-        User result = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));;
+        User result = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
         return new UserDTO(result);
     }
 
@@ -62,7 +68,7 @@ public class UserService {
     @Transactional
     public UserDTO update(Long id, UserRegistrationDTO dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
         user.updateUser(dto);
         user = userRepository.save(user);
         return new UserDTO(user);
@@ -71,7 +77,7 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
 
         userRepository.delete(user);
     }

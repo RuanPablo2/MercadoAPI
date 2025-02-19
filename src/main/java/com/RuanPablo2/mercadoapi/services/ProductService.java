@@ -2,6 +2,7 @@ package com.RuanPablo2.mercadoapi.services;
 
 import com.RuanPablo2.mercadoapi.dtos.ProductDTO;
 import com.RuanPablo2.mercadoapi.entities.Product;
+import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class ProductService {
     }
 
     public ProductDTO findById(Long id){
-        Product result = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));;
+        Product result = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
         return new ProductDTO(result);
     }
 
@@ -35,13 +36,16 @@ public class ProductService {
     @Transactional
     public ProductDTO update(Long id, ProductDTO dto) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
         product.updateData(dto);
         return new ProductDTO(productRepository.save(product));
     }
 
     @Transactional
     public void delete(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found", "PRD-404");
+        }
         productRepository.deleteById(id);
     }
 }
