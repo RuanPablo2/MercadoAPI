@@ -46,16 +46,16 @@ INSERT INTO tb_product (name, description, price, stock_quantity, category, imag
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Chocolate', 'Barra 90g', 5.80, 45, 'Doces', 'img10.jpg');
 
 -- ORDER
-INSERT INTO tb_order (user_id, created_at, status) VALUES (2, '2024-02-02 10:00:00', 'PENDING');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (3, '2024-02-01 14:30:00', 'COMPLETED');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (4, '2024-01-30 18:20:00', 'CANCELED');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (5, '2024-01-28 09:15:00', 'PROCESSING');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (6, '2024-01-27 20:10:00', 'OUT_FOR_DELIVERY');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (7, '2024-01-26 15:45:00', 'PENDING');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (8, '2024-01-25 13:50:00', 'COMPLETED');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (9, '2024-01-24 11:05:00', 'PROCESSING');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (10, '2024-01-23 08:30:00', 'OUT_FOR_DELIVERY');
-INSERT INTO tb_order (user_id, created_at, status) VALUES (2, '2024-01-22 17:25:00', 'CANCELED');
+INSERT INTO tb_order (user_id, created_at) VALUES (2, '2024-02-02 10:00:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (3, '2024-02-01 14:30:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (4, '2024-01-30 18:20:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (5, '2024-01-28 09:15:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (6, '2024-01-27 20:10:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (7, '2024-01-26 15:45:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (8, '2024-01-25 13:50:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (9, '2024-01-24 11:05:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (10, '2024-01-23 08:30:00');
+INSERT INTO tb_order (user_id, created_at) VALUES (2, '2024-01-22 17:25:00');
 
 -- ORDER ITEMS
 INSERT INTO tb_order_item (order_id, product_id, quantity, unit_price) VALUES (1, 1, 2, 25.90);
@@ -68,3 +68,26 @@ INSERT INTO tb_order_item (order_id, product_id, quantity, unit_price) VALUES (5
 INSERT INTO tb_order_item (order_id, product_id, quantity, unit_price) VALUES (6, 7, 2, 10.50);
 INSERT INTO tb_order_item (order_id, product_id, quantity, unit_price) VALUES (7, 9, 6, 3.50);
 INSERT INTO tb_order_item (order_id, product_id, quantity, unit_price) VALUES (8, 10, 3, 5.80);
+
+-- ORDER STATUS HISTORY
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (1, 'PENDING', '2024-02-02 10:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (2, 'PENDING', '2024-02-01 14:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (2, 'COMPLETED', '2024-02-01 14:30:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (3, 'PENDING', '2024-01-30 18:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (3, 'CANCELED', '2024-01-30 18:20:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (4, 'PENDING', '2024-01-28 09:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (4, 'PROCESSING', '2024-01-28 09:15:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (5, 'PENDING', '2024-01-27 20:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (5, 'PROCESSING', '2024-01-27 20:05:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (5, 'OUT_FOR_DELIVERY', '2024-01-27 20:10:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (6, 'PENDING', '2024-01-26 15:30:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (6, 'PROCESSING', '2024-01-26 15:40:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (6, 'OUT_FOR_DELIVERY', '2024-01-26 15:45:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (7, 'PENDING', '2024-01-25 13:50:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (8, 'PENDING', '2024-01-24 11:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (8, 'PROCESSING', '2024-01-24 11:05:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (9, 'PENDING', '2024-01-23 08:20:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (9, 'PROCESSING', '2024-01-23 08:25:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (9, 'OUT_FOR_DELIVERY', '2024-01-23 08:30:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (10, 'PENDING', '2024-01-22 17:00:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (10, 'CANCELED', '2024-01-22 17:25:00');

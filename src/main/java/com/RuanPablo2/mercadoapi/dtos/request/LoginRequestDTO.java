@@ -1,4 +1,4 @@
-package com.RuanPablo2.mercadoapi.dtos;
+package com.RuanPablo2.mercadoapi.dtos.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

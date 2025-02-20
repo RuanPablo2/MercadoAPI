@@ -1,9 +1,9 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.LoginRequestDTO;
-import com.RuanPablo2.mercadoapi.dtos.LoginResponseDTO;
-import com.RuanPablo2.mercadoapi.dtos.UserDTO;
-import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.LoginRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.LoginResponseDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.security.JwtUtil;

@@ -1,6 +1,6 @@
 package com.RuanPablo2.mercadoapi.entities;
 
-import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;

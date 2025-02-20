@@ -1,4 +1,4 @@
-package com.RuanPablo2.mercadoapi.dtos;
+package com.RuanPablo2.mercadoapi.dtos.request;
 
 import com.RuanPablo2.mercadoapi.entities.Product;
 import jakarta.validation.constraints.Min;

@@ -1,4 +1,4 @@
-package com.RuanPablo2.mercadoapi.dtos;
+package com.RuanPablo2.mercadoapi.dtos.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

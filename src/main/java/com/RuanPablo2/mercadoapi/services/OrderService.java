@@ -1,12 +1,10 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.OrderItemDTO;
-import com.RuanPablo2.mercadoapi.dtos.OrderDTO;
-import com.RuanPablo2.mercadoapi.entities.OrderItem;
+import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
 import com.RuanPablo2.mercadoapi.entities.Order;
-import com.RuanPablo2.mercadoapi.entities.Product;
-import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
+import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.OrderRepository;
@@ -19,45 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 public class OrderService {
 
     @Autowired
     OrderRepository orderRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ProductRepository productRepository;
-
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository) {
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-        this.productRepository = productRepository;
-    }
-
-    @Transactional
-    public OrderDTO save(OrderDTO orderDTO) {
-        User user = userRepository.findById(orderDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
-
-        List<OrderItem> orderItem = orderDTO.getItems().stream()
-                .map(itemDto -> {
-                    Product product = productRepository.findById(itemDto.getProductId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
-
-                    return new OrderItem(null, product, itemDto.getQuantity(), product.getPrice());
-                }).collect(Collectors.toList());
-
-        Order order = new Order(user, orderDTO.getStatus(), orderItem);
-
-        order = orderRepository.save(order);
-
-        return new OrderDTO(order);
-    }
 
     public Page<OrderDTO> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable).map(OrderDTO::new);
@@ -70,67 +36,87 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDTO update(Long id, OrderDTO dto) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
-
-        order.setStatus(dto.getStatus());
-
-        order = orderRepository.save(order);
-        return new OrderDTO(order);
-    }
-
-    @Transactional
-    public OrderDTO delete(Long id) {
-        Order order = orderRepository.findById(id)
+    public OrderDTO updateOrderStatus(Long orderId, OrderStatusUpdateRequestDTO requestDTO) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
-        // Verifica se o pedido já não está cancelado
-        if (order.getStatus() == OrderStatus.CANCELED) {
-            throw new BusinessException("This order has already been canceled.", "ORD-003");
+        OrderStatus currentStatus = order.getCurrentStatus();
+
+        if (isFinalStatus(currentStatus)) {
+            throw new BusinessException("Order status cannot be updated", "ORD-006");
         }
 
-        // Atualiza o status para CANCELED
-        order.setStatus(OrderStatus.CANCELED);
-        order = orderRepository.save(order);
+        validateStatusTransition(currentStatus, requestDTO.getStatus());
+
+        if (requestDTO.getStatus() == OrderStatus.OUT_FOR_DELIVERY && order.getTrackingCode() == null) {
+            order.setTrackingCode(generateTrackingCode(order));
+        }
+
+        order.addStatusHistory(requestDTO.getStatus());
+
+        return new OrderDTO(order);
+    }
+
+    private boolean isFinalStatus(OrderStatus status) {
+        return status == OrderStatus.CANCELED || status == OrderStatus.COMPLETED;
+    }
+
+    private String generateTrackingCode(Order order) {
+        return "TRK-" + order.getId() + "-" + System.currentTimeMillis();
+    }
+
+    @Transactional
+    public OrderDTO findByTrackingCode(String trackingCode) {
+        Order order = orderRepository.findByTrackingCode(trackingCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with tracking code", "ORD-404"));
         return new OrderDTO(order);
     }
 
     @Transactional
-    public OrderDTO addOrderItem(Long pedidoId, OrderItemDTO orderItemDTO) {
-        Order order = orderRepository.findById(pedidoId)
+    public OrderDTO cancelOrder(Long orderId, String userEmail, Role userRole) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
-        // Busca o product pelo ID fornecido no orderItemDTO
-        Product product = productRepository.findById(orderItemDTO.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
+        OrderStatus currentStatus = order.getCurrentStatus();
 
-        // Cria um novo item de order
-        OrderItem novoItem = new OrderItem(order, product, orderItemDTO.getQuantity(), product.getPrice());
+        if (currentStatus == OrderStatus.CANCELED || currentStatus == OrderStatus.COMPLETED || currentStatus == OrderStatus.OUT_FOR_DELIVERY) {
+            throw new BusinessException("Order cannot be canceled", "ORD-003");
+        }
 
-        // Adicione o novo item à lista de itens do pedido
-        order.getItems().add(novoItem);
+        if (userRole.equals(Role.ROLE_CLIENT)) {
+            if (!order.getUser().getEmail().equals(userEmail)) {
+                throw new BusinessException("You cannot cancel orders that are not yours", "ORD-004");
+            }
+            if (!(currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.PROCESSING)) {
+                throw new BusinessException("Clients can only cancel orders in CART, PENDING or PROCESSING status", "ORD-005");
+            }
+        }
 
-        order.getTotal();
-
-        order = orderRepository.save(order);
-
-        // Retorne o DTO atualizado do order
-        return new OrderDTO(order);
-    }
-
-    @Transactional
-    public OrderDTO deleteOrderItem(Long pedidoId, Long itemId) {
-        Order order = orderRepository.findById(pedidoId).orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
-
-        // Verifica se o item pertence ao order
-        boolean removed = order.getItems().removeIf(item -> item.getId().equals(itemId));
-
-        if (!removed) {
-            throw new BusinessException("Order item not found in the specified order", "ORD-005");
+        if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.PROCESSING) {
+            order.addStatusHistory(OrderStatus.REFUNDED);
+            // TO DO integrate with payment service for refund
+        } else {
+            order.addStatusHistory(OrderStatus.CANCELED);
         }
 
         order = orderRepository.save(order);
-
         return new OrderDTO(order);
+    }
+
+    private void validateStatusTransition(OrderStatus current, OrderStatus next) {
+        Map<OrderStatus, List<OrderStatus>> validTransitions = Map.of(
+                OrderStatus.CART, List.of(OrderStatus.PENDING, OrderStatus.CANCELED),
+                OrderStatus.PENDING, List.of(OrderStatus.PAID, OrderStatus.CANCELED),
+                OrderStatus.PAID, List.of(OrderStatus.PROCESSING, OrderStatus.CANCELED),
+                OrderStatus.PROCESSING, List.of(OrderStatus.OUT_FOR_DELIVERY, OrderStatus.CANCELED),
+                OrderStatus.OUT_FOR_DELIVERY, List.of(OrderStatus.COMPLETED),
+                OrderStatus.CANCELED, List.of(),
+                OrderStatus.REFUNDED, List.of(),
+                OrderStatus.COMPLETED, List.of()
+        );
+
+        if (!validTransitions.getOrDefault(current, List.of()).contains(next)) {
+            throw new BusinessException("Invalid status transition: " + current + " -> " + next, "ORD-007");
+        }
     }
 }

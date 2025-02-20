@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(of = "id")
@@ -25,25 +27,50 @@ public class Order {
 
     private LocalDateTime createdAt;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    @Column(unique = true)
+    private String trackingCode;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
-    public Order() { //Seta a data de criacao automaticamente
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderStatusHistory> statusHistory = new ArrayList<>();
+
+    public Order() {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Order(User user, OrderStatus status, List<OrderItem> items) {
+    public Order(User user, String trackingCode, List<OrderItem> items) {
+        this();
         this.user = user;
-        this.status = status;
-        this.items = items;
+        this.trackingCode = trackingCode;
+
+        if (items != null) {
+            items.forEach(this::addItem);
+        }
+
+        this.addStatusHistory(OrderStatus.PENDING);
     }
 
-    public BigDecimal getTotal() { // soma todos os produtos do pedido para dar o total
+    public BigDecimal getTotal() {
         return items.stream()
                 .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public void addItem(OrderItem item) {
+        item.setOrder(this);
+        this.items.add(item);
+    }
+
+    public void addStatusHistory(OrderStatus status) {
+        this.statusHistory.add(new OrderStatusHistory(status, this));
+    }
+
+    public OrderStatus getCurrentStatus() {
+        return statusHistory.isEmpty()
+                ? null
+                : statusHistory.get(statusHistory.size() - 1).getStatus();
     }
 }

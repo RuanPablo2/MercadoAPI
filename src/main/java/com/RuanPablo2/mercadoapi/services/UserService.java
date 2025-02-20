@@ -1,7 +1,7 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.UserRegistrationDTO;
-import com.RuanPablo2.mercadoapi.dtos.UserDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
 import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service

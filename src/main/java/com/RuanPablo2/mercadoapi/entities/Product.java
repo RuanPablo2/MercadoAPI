@@ -1,6 +1,6 @@
 package com.RuanPablo2.mercadoapi.entities;
 
-import com.RuanPablo2.mercadoapi.dtos.ProductDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ProductDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

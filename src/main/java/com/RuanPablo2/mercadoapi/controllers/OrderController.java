@@ -1,7 +1,8 @@
 package com.RuanPablo2.mercadoapi.controllers;
 
-import com.RuanPablo2.mercadoapi.dtos.OrderItemDTO;
-import com.RuanPablo2.mercadoapi.dtos.OrderDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
+import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.services.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -34,34 +35,24 @@ public class OrderController {
         return ResponseEntity.ok(orderDTO);
     }
 
-    @PostMapping
-    public ResponseEntity<OrderDTO> save(@Valid @RequestBody OrderDTO dto) {
-        OrderDTO orderDTO = orderService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<OrderDTO> update(@PathVariable Long id, @Valid @RequestBody OrderDTO dto) {
-        OrderDTO orderDTO = orderService.update(id, dto);
+    @PatchMapping("/{orderId}/status")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long orderId, @RequestBody @Valid OrderStatusUpdateRequestDTO request) {
+        OrderDTO orderDTO = orderService.updateOrderStatus(orderId, request);
         return ResponseEntity.ok(orderDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        orderService.delete(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/tracking/{trackingCode}")
+    public ResponseEntity<OrderDTO> findByTrackingCode(@PathVariable String trackingCode) {
+        OrderDTO dto = orderService.findByTrackingCode(trackingCode);
+        return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/{orderId}/items/{itemId}")
-    public ResponseEntity<OrderDTO> deleteOrderItem(@PathVariable Long orderId, @PathVariable Long itemId) {
-        OrderDTO orderDTO = orderService.deleteOrderItem(orderId, itemId);
-        return ResponseEntity.ok(orderDTO);
-    }
-
-    @PostMapping("/{id}/items")
-    public ResponseEntity<OrderDTO> addOrderItem(@PathVariable Long id,
-                                                 @Valid @RequestBody OrderItemDTO itemDto) {
-        OrderDTO orderDTO = orderService.addOrderItem(id, itemDto);
+    @PutMapping("/{orderId}/cancel")
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT', 'ROLE_ADMIN')")
+    public ResponseEntity<OrderDTO> cancelOrder(@PathVariable Long orderId, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO orderDTO = orderService.cancelOrder(orderId, userDetails.getEmail(), userDetails.getRole());
         return ResponseEntity.ok(orderDTO);
     }
 }

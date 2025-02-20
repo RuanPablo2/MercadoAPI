@@ -1,6 +1,6 @@
 package com.RuanPablo2.mercadoapi.entities;
 
-import com.RuanPablo2.mercadoapi.dtos.AddressDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.AddressDTO;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

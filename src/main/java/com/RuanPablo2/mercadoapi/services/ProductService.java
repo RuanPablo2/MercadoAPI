@@ -1,6 +1,6 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.ProductDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ProductDTO;
 import com.RuanPablo2.mercadoapi.entities.Product;
 import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class ProductService {
