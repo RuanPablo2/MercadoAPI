@@ -13,6 +13,8 @@ import com.RuanPablo2.mercadoapi.repositories.OrderRepository;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,9 +59,8 @@ public class OrderService {
         return new OrderDTO(order);
     }
 
-    @Transactional
-    public List<OrderDTO> findAll() {
-        return orderRepository.findAll().stream().map(OrderDTO::new).collect(Collectors.toList());
+    public Page<OrderDTO> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable).map(OrderDTO::new);
     }
 
     @Transactional

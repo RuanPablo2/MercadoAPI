@@ -8,6 +8,8 @@ import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +53,8 @@ public class UserService {
         return new UserDTO(user);
     }
 
-    public List<UserDTO> findAll(){
-        List<User> result = userRepository.findAll();
-        return result.stream().map(x -> new UserDTO(x)).toList();
+    public Page<UserDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(UserDTO::new);
     }
 
     public UserDTO findById(Long id){
