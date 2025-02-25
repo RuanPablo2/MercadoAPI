@@ -40,6 +40,12 @@ public class Order {
         this.createdAt = LocalDateTime.now();
     }
 
+    public Order(User user) {
+        this();
+        this.user = user;
+        this.addStatusHistory(OrderStatus.CART);
+    }
+
     public Order(User user, String trackingCode, List<OrderItem> items) {
         this();
         this.user = user;

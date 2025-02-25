@@ -2,6 +2,7 @@ package com.RuanPablo2.mercadoapi.controllers;
 
 import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.OrderItemRequestDTO;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.services.OrderService;
 import jakarta.validation.Valid;
@@ -32,6 +33,40 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> findById(@PathVariable Long id) {
         OrderDTO orderDTO = orderService.findById(id);
+        return ResponseEntity.ok(orderDTO);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<OrderDTO> createCart(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO cart = orderService.createCart(userDetails.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(cart);
+    }
+
+    @PostMapping("/{orderId}/items")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<OrderDTO> addItemToCart(@PathVariable Long orderId,
+                                                  @RequestBody @Valid OrderItemRequestDTO itemRequest,
+                                                  Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO orderDTO = orderService.addItemToCart(orderId, itemRequest, userDetails.getId());
+        return ResponseEntity.ok(orderDTO);
+    }
+
+    @PutMapping("/{orderId}/confirm-payment")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<OrderDTO> confirmPayment(@PathVariable Long orderId, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO orderDTO = orderService.confirmPayment(orderId, userDetails.getId());
+        return ResponseEntity.ok(orderDTO);
+    }
+
+    @PutMapping("/{orderId}/checkout")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<OrderDTO> checkout(@PathVariable Long orderId, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO orderDTO = orderService.checkout(orderId, userDetails.getId());
         return ResponseEntity.ok(orderDTO);
     }
 

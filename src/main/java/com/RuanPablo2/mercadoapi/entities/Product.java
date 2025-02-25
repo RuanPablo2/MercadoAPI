@@ -46,4 +46,15 @@ public class Product {
         this.price = dto.getPrice();
         this.stockQuantity = dto.getStockQuantity();
     }
+
+    public void decreaseStock(int quantity) {
+        if (this.stockQuantity < quantity) {
+            throw new RuntimeException("Not enough stock available.");
+        }
+        this.stockQuantity -= quantity;
+    }
+
+    public void increaseStock(int quantity) {
+        this.stockQuantity += quantity;
+    }
 }

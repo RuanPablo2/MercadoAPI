@@ -1,8 +1,12 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.OrderItemRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
 import com.RuanPablo2.mercadoapi.entities.Order;
+import com.RuanPablo2.mercadoapi.entities.OrderItem;
+import com.RuanPablo2.mercadoapi.entities.Product;
+import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
@@ -24,6 +28,12 @@ public class OrderService {
 
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    ProductRepository productRepository;
 
     public Page<OrderDTO> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable).map(OrderDTO::new);
@@ -100,6 +110,84 @@ public class OrderService {
         }
 
         order = orderRepository.save(order);
+        return new OrderDTO(order);
+    }
+
+    @Transactional
+    public OrderDTO createCart(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
+
+        Order cart = new Order(user);
+        orderRepository.save(cart);
+        return new OrderDTO(cart);
+    }
+
+    @Transactional
+    public OrderDTO addItemToCart(Long orderId, OrderItemRequestDTO itemRequest, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new BusinessException("This order does not belong to you", "ORD-008");
+        }
+
+        if (order.getCurrentStatus() != OrderStatus.CART) {
+            throw new BusinessException("Order is not in CART status", "ORD-009");
+        }
+
+        Product product = productRepository.findById(itemRequest.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct(product);
+        orderItem.setQuantity(itemRequest.getQuantity());
+        orderItem.setUnitPrice(product.getPrice());
+        order.addItem(orderItem);
+
+        orderRepository.save(order);
+        return new OrderDTO(order);
+    }
+
+    @Transactional
+    public OrderDTO confirmPayment(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new BusinessException("This order does not belong to you", "ORD-008");
+        }
+
+        if (order.getCurrentStatus() != OrderStatus.PENDING) {
+            throw new BusinessException("Order is not in PENDING status", "ORD-010");
+        }
+
+        order.addStatusHistory(OrderStatus.PAID);
+
+        for (OrderItem item : order.getItems()) {
+            Product product = item.getProduct();
+            product.decreaseStock(item.getQuantity());
+        }
+
+        orderRepository.save(order);
+        return new OrderDTO(order);
+    }
+
+    @Transactional
+    public OrderDTO checkout(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new BusinessException("This order does not belong to you", "ORD-008");
+        }
+
+        if (order.getCurrentStatus() != OrderStatus.CART) {
+            throw new BusinessException("Order is not in CART status", "ORD-009");
+        }
+
+        order.addStatusHistory(OrderStatus.PENDING);
+        orderRepository.save(order);
         return new OrderDTO(order);
     }
 
