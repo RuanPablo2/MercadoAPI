@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -102,14 +103,21 @@ public class OrderService {
             }
         }
 
+        if (currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.releaseReservedStock(item.getQuantity());
+            }
+        }
+
         if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.PROCESSING) {
             order.addStatusHistory(OrderStatus.REFUNDED);
-            // TO DO integrate with payment service for refund
+            // TO DO Integrate with payment service for refund
         } else {
             order.addStatusHistory(OrderStatus.CANCELED);
         }
 
-        order = orderRepository.save(order);
+        orderRepository.save(order);
         return new OrderDTO(order);
     }
 
@@ -139,11 +147,37 @@ public class OrderService {
         Product product = productRepository.findById(itemRequest.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
 
-        OrderItem orderItem = new OrderItem();
-        orderItem.setProduct(product);
-        orderItem.setQuantity(itemRequest.getQuantity());
-        orderItem.setUnitPrice(product.getPrice());
-        order.addItem(orderItem);
+        int currentQuantity = order.getItems().stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .mapToInt(OrderItem::getQuantity)
+                .sum();
+
+        int newTotalQuantity = currentQuantity + itemRequest.getQuantity();
+
+        if (newTotalQuantity > product.getStockQuantity()) {
+            throw new BusinessException("Insufficient stock available for product: " + product.getName(), "STK-001");
+        }
+
+        // Se o item já existe, atualiza a quantidade; senão, cria um novo
+        Optional<OrderItem> existingItemOpt = order.getItems().stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .findFirst();
+
+        if (existingItemOpt.isPresent()) {
+            OrderItem existingItem = existingItemOpt.get();
+            int additionalQuantity = itemRequest.getQuantity();
+            // Reserve apenas a quantidade adicional
+            product.reserveStock(additionalQuantity);
+            existingItem.setQuantity(existingItem.getQuantity() + additionalQuantity);
+        } else {
+            // Reserva a quantidade desejada
+            product.reserveStock(itemRequest.getQuantity());
+            OrderItem newItem = new OrderItem();
+            newItem.setProduct(product);
+            newItem.setQuantity(itemRequest.getQuantity());
+            newItem.setUnitPrice(product.getPrice());
+            order.addItem(newItem);
+        }
 
         orderRepository.save(order);
         return new OrderDTO(order);
@@ -166,7 +200,7 @@ public class OrderService {
 
         for (OrderItem item : order.getItems()) {
             Product product = item.getProduct();
-            product.decreaseStock(item.getQuantity());
+            product.finalizeReservation(item.getQuantity());
         }
 
         orderRepository.save(order);

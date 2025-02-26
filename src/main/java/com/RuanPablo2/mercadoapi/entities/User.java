@@ -54,6 +54,7 @@ public class User {
         this.name = dto.getName();
         this.email = dto.getEmail();
         this.password = dto.getPassword();
+        this.cpf = dto.getCpf();
         this.address = new Address(dto.getAddress());
     }
 }

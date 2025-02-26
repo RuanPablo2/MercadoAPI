@@ -1,6 +1,7 @@
 package com.RuanPablo2.mercadoapi.entities;
 
 import com.RuanPablo2.mercadoapi.dtos.request.ProductDTO;
+import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,10 @@ public class Product {
     private String description;
     private BigDecimal price;
     private Integer stockQuantity;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer reservedQuantity = 0;
+
     private String category;
     private String imageUrl;
 
@@ -31,6 +36,7 @@ public class Product {
         this.stockQuantity = stockQuantity;
         this.category = category;
         this.imageUrl = imageUrl;
+        this.reservedQuantity = 0;
     }
 
     public Product(ProductDTO dto) {
@@ -38,6 +44,7 @@ public class Product {
         this.description = dto.getDescription();
         this.price = dto.getPrice();
         this.stockQuantity = dto.getStockQuantity();
+        this.reservedQuantity = 0;
     }
 
     public void updateData(ProductDTO dto) {
@@ -47,14 +54,38 @@ public class Product {
         this.stockQuantity = dto.getStockQuantity();
     }
 
+    public int getAvailableStock() {
+        return this.stockQuantity - this.reservedQuantity;
+    }
+
     public void decreaseStock(int quantity) {
         if (this.stockQuantity < quantity) {
-            throw new RuntimeException("Not enough stock available.");
+            throw new BusinessException("Not enough stock available.", "STK-002");
         }
         this.stockQuantity -= quantity;
     }
 
     public void increaseStock(int quantity) {
         this.stockQuantity += quantity;
+    }
+
+    public void reserveStock(int quantity) {
+        if (this.reservedQuantity + quantity > this.stockQuantity) {
+            throw new BusinessException("Not enough stock available for reservation.", "STK-003");
+        }
+        this.reservedQuantity += quantity;
+    }
+
+    // Libera uma quantidade reservada
+    public void releaseReservedStock(int quantity) {
+        if (this.reservedQuantity < quantity) {
+            throw new BusinessException("Cannot release more stock than reserved.", "STK-004");
+        }
+        this.reservedQuantity -= quantity;
+    }
+
+    public void finalizeReservation(int quantity) {
+        releaseReservedStock(quantity);
+        decreaseStock(quantity);
     }
 }
