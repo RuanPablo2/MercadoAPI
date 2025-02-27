@@ -3,6 +3,7 @@ package com.RuanPablo2.mercadoapi.services;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderItemRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.OrderSummaryDTO;
 import com.RuanPablo2.mercadoapi.entities.Order;
 import com.RuanPablo2.mercadoapi.entities.OrderItem;
 import com.RuanPablo2.mercadoapi.entities.Product;
@@ -14,6 +15,7 @@ import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.OrderRepository;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
+import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,14 +38,26 @@ public class OrderService {
     @Autowired
     ProductRepository productRepository;
 
-    public Page<OrderDTO> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(OrderDTO::new);
+    @Transactional(readOnly = true)
+    public Page<OrderSummaryDTO> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable).map(OrderSummaryDTO::new);
     }
 
-    @Transactional
-    public OrderDTO findById(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+    @Transactional(readOnly = true)
+    public OrderDTO findByIdAndValidateOwner(Long orderId, CustomUserDetails userDetails) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+        if (userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            if (!order.getUser().getId().equals(userDetails.getId())) {
+                throw new BusinessException("You do not have permission to view this order", "ORD-012");
+            }
+        }
         return new OrderDTO(order);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderSummaryDTO> findByUserId(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable).map(OrderSummaryDTO::new);
     }
 
     @Transactional
@@ -103,17 +117,22 @@ public class OrderService {
             }
         }
 
-        if (currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING) {
+        if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.PROCESSING) {
             for (OrderItem item : order.getItems()) {
                 Product product = item.getProduct();
-                product.releaseReservedStock(item.getQuantity());
-            }
-        }
 
-        if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.PROCESSING) {
+                product.increaseStock(item.getQuantity());
+            }
             order.addStatusHistory(OrderStatus.REFUNDED);
-            // TO DO Integrate with payment service for refund
+            // TO DO Integrar com o serviço de pagamento para processar o reembolso
         } else {
+
+            if (currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING) {
+                for (OrderItem item : order.getItems()) {
+                    Product product = item.getProduct();
+                    product.releaseReservedStock(item.getQuantity());
+                }
+            }
             order.addStatusHistory(OrderStatus.CANCELED);
         }
 
@@ -123,9 +142,13 @@ public class OrderService {
 
     @Transactional
     public OrderDTO createCart(Long userId) {
+        Optional<Order> existingCart = orderRepository.findByUserIdAndCurrentStatus(userId, OrderStatus.CART.toString());
+        if (existingCart.isPresent()) {
+            return new OrderDTO(existingCart.get());
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
-
         Order cart = new Order(user);
         orderRepository.save(cart);
         return new OrderDTO(cart);
@@ -218,6 +241,10 @@ public class OrderService {
 
         if (order.getCurrentStatus() != OrderStatus.CART) {
             throw new BusinessException("Order is not in CART status", "ORD-009");
+        }
+
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            throw new BusinessException("Cart is empty. Cannot proceed to checkout.", "ORD-011");
         }
 
         order.addStatusHistory(OrderStatus.PENDING);

@@ -38,7 +38,7 @@ INSERT INTO tb_product (name, description, price, stock_quantity, category, imag
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Feijao', 'Pacote de 1kg', 8.90, 40, 'Alimentos', 'img2.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Oleo de Soja', 'Garrafa de 900ml', 7.50, 30, 'Alimentos', 'img3.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Leite', 'Caixa 1L', 4.80, 60, 'Laticinios', 'img4.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Pao de Forma', 'Pão 500g', 6.20, 20, 'Padaria', 'img5.jpg');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Pao de Forma', 'Pao 500g', 6.20, 20, 'Padaria', 'img5.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Detergente', '500ml', 2.30, 100, 'Limpeza', 'img6.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Sabao em Po', '1kg', 10.50, 35, 'Limpeza', 'img7.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Refrigerante', 'Garrafa 2L', 9.00, 25, 'Bebidas', 'img8.jpg');

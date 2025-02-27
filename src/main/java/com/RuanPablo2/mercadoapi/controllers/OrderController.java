@@ -3,6 +3,7 @@ package com.RuanPablo2.mercadoapi.controllers;
 import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderItemRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.OrderSummaryDTO;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.services.OrderService;
 import jakarta.validation.Valid;
@@ -24,16 +25,30 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<Page<OrderDTO>> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Page<OrderSummaryDTO>> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<OrderDTO> ordersPage = orderService.findAll(pageable);
+        Page<OrderSummaryDTO> ordersPage = orderService.findAll(pageable);
         return ResponseEntity.ok(ordersPage);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDTO> findById(@PathVariable Long id) {
-        OrderDTO orderDTO = orderService.findById(id);
+    public ResponseEntity<OrderDTO> findById(@PathVariable Long id, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO orderDTO = orderService.findByIdAndValidateOwner(id, userDetails);
         return ResponseEntity.ok(orderDTO);
+    }
+
+    @GetMapping("/my-orders")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<Page<OrderSummaryDTO>> findMyOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<OrderSummaryDTO> ordersPage = orderService.findByUserId(userDetails.getId(), pageable);
+        return ResponseEntity.ok(ordersPage);
     }
 
     @PostMapping
