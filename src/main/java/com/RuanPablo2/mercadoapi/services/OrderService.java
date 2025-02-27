@@ -10,8 +10,7 @@ import com.RuanPablo2.mercadoapi.entities.Product;
 import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
-import com.RuanPablo2.mercadoapi.exception.BusinessException;
-import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
+import com.RuanPablo2.mercadoapi.exception.*;
 import com.RuanPablo2.mercadoapi.repositories.OrderRepository;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
@@ -49,7 +48,7 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
         if (userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             if (!order.getUser().getId().equals(userDetails.getId())) {
-                throw new BusinessException("You do not have permission to view this order", "ORD-012");
+                throw new ForbiddenException("You do not have permission to view this order", "ORD-012");
             }
         }
         return new OrderDTO(order);
@@ -68,7 +67,7 @@ public class OrderService {
         OrderStatus currentStatus = order.getCurrentStatus();
 
         if (isFinalStatus(currentStatus)) {
-            throw new BusinessException("Order status cannot be updated", "ORD-006");
+            throw new OrderStatusException("Order status cannot be updated", "ORD-006");
         }
 
         validateStatusTransition(currentStatus, requestDTO.getStatus());
@@ -105,15 +104,15 @@ public class OrderService {
         OrderStatus currentStatus = order.getCurrentStatus();
 
         if (currentStatus == OrderStatus.CANCELED || currentStatus == OrderStatus.COMPLETED || currentStatus == OrderStatus.OUT_FOR_DELIVERY) {
-            throw new BusinessException("Order cannot be canceled", "ORD-003");
+            throw new OrderStatusException("Order cannot be canceled", "ORD-003");
         }
 
         if (userRole.equals(Role.ROLE_CLIENT)) {
             if (!order.getUser().getEmail().equals(userEmail)) {
-                throw new BusinessException("You cannot cancel orders that are not yours", "ORD-004");
+                throw new ForbiddenException("You cannot cancel orders that are not yours", "ORD-004");
             }
             if (!(currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.PROCESSING)) {
-                throw new BusinessException("Clients can only cancel orders in CART, PENDING or PROCESSING status", "ORD-005");
+                throw new OrderStatusException("Clients can only cancel orders in CART, PENDING or PROCESSING status", "ORD-005");
             }
         }
 
@@ -160,11 +159,11 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         if (!order.getUser().getId().equals(userId)) {
-            throw new BusinessException("This order does not belong to you", "ORD-008");
+            throw new ForbiddenException("This order does not belong to you", "ORD-008");
         }
 
         if (order.getCurrentStatus() != OrderStatus.CART) {
-            throw new BusinessException("Order is not in CART status", "ORD-009");
+            throw new OrderStatusException("Order is not in CART status", "ORD-009");
         }
 
         Product product = productRepository.findById(itemRequest.getProductId())
@@ -178,7 +177,7 @@ public class OrderService {
         int newTotalQuantity = currentQuantity + itemRequest.getQuantity();
 
         if (newTotalQuantity > product.getStockQuantity()) {
-            throw new BusinessException("Insufficient stock available for product: " + product.getName(), "STK-001");
+            throw new StockException("Insufficient stock available for product: " + product.getName(), "STK-001");
         }
 
         // Se o item já existe, atualiza a quantidade; senão, cria um novo
@@ -212,11 +211,11 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         if (!order.getUser().getId().equals(userId)) {
-            throw new BusinessException("This order does not belong to you", "ORD-008");
+            throw new ForbiddenException("This order does not belong to you", "ORD-008");
         }
 
         if (order.getCurrentStatus() != OrderStatus.PENDING) {
-            throw new BusinessException("Order is not in PENDING status", "ORD-010");
+            throw new OrderStatusException("Order is not in PENDING status", "ORD-010");
         }
 
         order.addStatusHistory(OrderStatus.PAID);
@@ -236,15 +235,22 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
         if (!order.getUser().getId().equals(userId)) {
-            throw new BusinessException("This order does not belong to you", "ORD-008");
+            throw new ForbiddenException("This order does not belong to you", "ORD-008");
         }
 
         if (order.getCurrentStatus() != OrderStatus.CART) {
-            throw new BusinessException("Order is not in CART status", "ORD-009");
+            throw new OrderStatusException("Order is not in CART status", "ORD-009");
         }
 
         if (order.getItems() == null || order.getItems().isEmpty()) {
             throw new BusinessException("Cart is empty. Cannot proceed to checkout.", "ORD-011");
+        }
+
+        for (OrderItem item : order.getItems()) {
+            Product product = item.getProduct();
+            if (item.getQuantity() > product.getStockQuantity()) {
+                throw new StockException("Insufficient stock available for product: " + product.getName(), "STK-001");
+            }
         }
 
         order.addStatusHistory(OrderStatus.PENDING);
@@ -265,7 +271,7 @@ public class OrderService {
         );
 
         if (!validTransitions.getOrDefault(current, List.of()).contains(next)) {
-            throw new BusinessException("Invalid status transition: " + current + " -> " + next, "ORD-007");
+            throw new OrderStatusException("Invalid status transition: " + current + " -> " + next, "ORD-007");
         }
     }
 }

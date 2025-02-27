@@ -5,6 +5,7 @@ import com.RuanPablo2.mercadoapi.dtos.response.LoginResponseDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
+import com.RuanPablo2.mercadoapi.exception.UnauthorizedException;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class AuthService {
 
             return response;
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Usuário ou senha inválidos", e);
+            throw new UnauthorizedException("Invalid username or password", "AUTH-001", e);
         }
     }
 

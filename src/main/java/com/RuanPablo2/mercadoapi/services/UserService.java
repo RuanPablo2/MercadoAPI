@@ -5,6 +5,7 @@ import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
 import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
+import com.RuanPablo2.mercadoapi.exception.ForbiddenException;
 import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,13 @@ public class UserService {
     public UserDTO update(Long id, UserRegistrationDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
+
+        if (!user.getEmail().equals(dto.getEmail())) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw new ForbiddenException("Email already in use", "USR-EMAIL");
+            }
+        }
+
         user.updateUser(dto);
         user = userRepository.save(user);
         return new UserDTO(user);

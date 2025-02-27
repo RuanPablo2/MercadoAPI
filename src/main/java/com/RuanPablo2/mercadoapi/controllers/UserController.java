@@ -2,6 +2,7 @@ package com.RuanPablo2.mercadoapi.controllers;
 
 import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
+import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,10 +52,20 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
+    @PutMapping("/me")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<UserDTO> updateMyProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody UserRegistrationDTO dto) {
+        UserDTO updatedUser = userService.update(userDetails.getId(), dto);
+        return ResponseEntity.ok(updatedUser);
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }
