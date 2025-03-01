@@ -1,19 +1,32 @@
 package com.RuanPablo2.mercadoapi.services;
 
+import com.RuanPablo2.mercadoapi.dtos.request.ForgotPasswordRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.LoginRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ResetPasswordRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.LoginResponseDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.entities.PasswordResetToken;
+import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
+import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
 import com.RuanPablo2.mercadoapi.exception.UnauthorizedException;
+import com.RuanPablo2.mercadoapi.repositories.PasswordResetTokenRepository;
+import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -22,10 +35,22 @@ public class AuthService {
     private UserService userService;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Value("${app.reset-password-base-url}")
+    private String resetPasswordBaseUrl;
 
     public LoginResponseDTO login(LoginRequestDTO loginRequest) {
         try {
@@ -55,5 +80,42 @@ public class AuthService {
         }
 
         return userService.save(userRegistrationDTO, isAdminCreating);
+    }
+
+    @Transactional
+    public void requestPasswordReset(ForgotPasswordRequestDTO requestDTO) {
+        User user = userRepository.findByEmail(requestDTO.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
+
+        passwordResetTokenRepository.deleteByUser(user);
+
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiration = LocalDateTime.now().plusHours(1);
+
+        PasswordResetToken resetToken = new PasswordResetToken(token, user, expiration);
+        passwordResetTokenRepository.save(resetToken);
+
+        String resetLink = resetPasswordBaseUrl + "?token=" + token;
+
+        // Envia email com o link
+        //emailService.sendEmail(user.getEmail(), "Password Reset Request", "Click the link to reset your password: " + resetLink);
+
+        System.out.println("Reset password link: " + resetLink);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequestDTO requestDTO) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(requestDTO.getToken())
+                .orElseThrow(() -> new BusinessException("Invalid or expired token", "RST-001"));
+
+        if (resetToken.isExpired()) {
+            throw new BusinessException("Token expired", "RST-002");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(requestDTO.getNewPassword()));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
     }
 }

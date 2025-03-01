@@ -1,7 +1,9 @@
 package com.RuanPablo2.mercadoapi.controllers;
 
 
+import com.RuanPablo2.mercadoapi.dtos.request.ForgotPasswordRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.LoginRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ResetPasswordRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.LoginResponseDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
@@ -36,5 +38,17 @@ public class AuthController {
     public ResponseEntity<UserDTO> register(@RequestBody @Valid UserRegistrationDTO userRegistrationDTO) {
             UserDTO savedUser = authService.register(userRegistrationDTO, false);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO requestDTO) {
+        authService.requestPasswordReset(requestDTO);
+        return ResponseEntity.ok("If the email exists, a password reset link has been sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid ResetPasswordRequestDTO requestDTO) {
+        authService.resetPassword(requestDTO);
+        return ResponseEntity.ok("Password has been reset successfully.");
     }
 }

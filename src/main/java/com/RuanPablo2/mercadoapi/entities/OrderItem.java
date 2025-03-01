@@ -27,7 +27,7 @@ public class OrderItem {
     private Product product;
 
     private Integer quantity;
-    private BigDecimal unitPrice; // Preço unitário do produto no momento do order
+    private BigDecimal unitPrice; // Preço unitário do produto no momento do pedido
 
     public OrderItem(Order order, Product product, Integer quantity, BigDecimal unitPrice) {
         this.order = order;
