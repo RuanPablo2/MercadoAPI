@@ -52,6 +52,9 @@ public class AuthService {
     @Value("${app.reset-password-base-url}")
     private String resetPasswordBaseUrl;
 
+    @Autowired
+    private EmailService emailService;
+
     public LoginResponseDTO login(LoginRequestDTO loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -87,6 +90,7 @@ public class AuthService {
         User user = userRepository.findByEmail(requestDTO.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found", "USR-404"));
 
+        // Remove token antigo, se existir
         passwordResetTokenRepository.deleteByUser(user);
 
         String token = UUID.randomUUID().toString();
@@ -97,10 +101,15 @@ public class AuthService {
 
         String resetLink = resetPasswordBaseUrl + "?token=" + token;
 
-        // Envia email com o link
-        //emailService.sendEmail(user.getEmail(), "Password Reset Request", "Click the link to reset your password: " + resetLink);
+        String htmlContent = "<html><body>"
+                + "<h2>Password Reset Request</h2>"
+                + "<p>Hello " + user.getName() + ",</p>"
+                + "<p>You requested to reset your password. Click the link below to proceed:</p>"
+                + "<a href='" + resetLink + "'>Reset Password</a>"
+                + "<p>If you did not request a password reset, please ignore this email.</p>"
+                + "</body></html>";
 
-        System.out.println("Reset password link: " + resetLink);
+        emailService.sendHtmlEmail(user.getEmail(), "Password Reset Request", htmlContent);
     }
 
     @Transactional
