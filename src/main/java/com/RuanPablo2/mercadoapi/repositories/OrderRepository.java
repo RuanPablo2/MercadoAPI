@@ -33,4 +33,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByUserIdAndCurrentStatus(@Param("userId") Long userId, @Param("status") String status);
 
     Page<Order> findByUserId(Long userId, Pageable pageable);
+
+    Optional<Order> findByPaymentIntentId(String paymentIntentId);
 }

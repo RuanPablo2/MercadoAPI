@@ -12,7 +12,7 @@ INSERT INTO tb_address (street, number, complement, neighborhood, city, state, z
 
 -- USER
 INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf) VALUES ('Admin', 'admin@email.com', '$2a$10$m8G9wa0BU6zP.7kyjSxLKOjxJ2dF/Wb.xZb.ck.C4ncad/Lly3fBu', 1, '11999999999', 'ROLE_ADMIN', '12345678900');
-INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf) VALUES ('Joao Silva', 'ruanpablo2.dev@gmail.com', '$2a$10$S4YimPUn4lgi27En.Qf42..JQGtOIFsgCACVCX5XhxuKn/buYkiOa', 2, '11987654321', 'ROLE_CLIENT', '98765432100');
+INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf) VALUES ('Joao Silva', 'joaosilva@email.com', '$2a$10$S4YimPUn4lgi27En.Qf42..JQGtOIFsgCACVCX5XhxuKn/buYkiOa', 2, '11987654321', 'ROLE_CLIENT', '98765432100');
 INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf) VALUES ('Maria Souza', 'maria@email.com', '$2a$10$fqNvBUOfIKPEQgxxzB42M.d30kCcOJCKMNIAznqfY5.NvVXR65DrC', 3, '11876543210', 'ROLE_CLIENT', '98765432101');
 INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf) VALUES ('Carlos Mendes', 'carlos@email.com', '$2a$10$w7C3Vdilmdz7zgm8w53D9eWnuviVVo8D/7oM.5o7oHkeWi8Vq8esy', 4, '11765432109', 'ROLE_CLIENT', '98765432102');
 INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf) VALUES ('Ana Pereira', 'ana@email.com', '$2a$10$XLDaaN3D5tyPfG6lnwNMXOuecvUlugHaWkVTU46jxP0aRZ8nY6eDa', 5, '11654321098', 'ROLE_CLIENT', '98765432103');

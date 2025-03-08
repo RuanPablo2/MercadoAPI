@@ -37,6 +37,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
+    private String paymentIntentId;
+    private String refundId;
+
     public Order() {
         this.createdAt = LocalDateTime.now();
     }

@@ -15,6 +15,8 @@ import com.RuanPablo2.mercadoapi.repositories.OrderRepository;
 import com.RuanPablo2.mercadoapi.repositories.ProductRepository;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,9 @@ public class OrderService {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    PaymentService paymentService;
 
     @Transactional(readOnly = true)
     public Page<OrderSummaryDTO> findAll(Pageable pageable) {
@@ -117,19 +122,28 @@ public class OrderService {
         }
 
         if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.PROCESSING) {
-            for (OrderItem item : order.getItems()) {
-                Product product = item.getProduct();
-
-                product.increaseStock(item.getQuantity());
+            // Verifica se há um paymentIntentId antes de tentar o reembolso
+            if (order.getPaymentIntentId() == null) {
+                throw new PaymentException("Order has no payment intent, refund not possible", "PAY-001");
             }
-            order.addStatusHistory(OrderStatus.REFUNDED);
-            // TO DO Integrar com o serviço de pagamento para processar o reembolso
-        } else {
 
+            try {
+                Refund refund = paymentService.refundPayment(order.getPaymentIntentId());
+                order.setRefundId(refund.getId());
+
+                // Repoe o estoque
+                for (OrderItem item : order.getItems()) {
+                    item.getProduct().increaseStock(item.getQuantity());
+                }
+            } catch (PaymentException e) {
+                throw new PaymentException("Failed to refund payment", "PAY-002", e);
+            }
+
+            order.addStatusHistory(OrderStatus.REFUNDED);
+        } else {
             if (currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING) {
                 for (OrderItem item : order.getItems()) {
-                    Product product = item.getProduct();
-                    product.releaseReservedStock(item.getQuantity());
+                    item.getProduct().releaseReservedStock(item.getQuantity());
                 }
             }
             order.addStatusHistory(OrderStatus.CANCELED);
@@ -256,6 +270,33 @@ public class OrderService {
         order.addStatusHistory(OrderStatus.PENDING);
         orderRepository.save(order);
         return new OrderDTO(order);
+    }
+
+    @Transactional
+    public void savePaymentIntentId(Long orderId, String paymentIntentId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+        order.setPaymentIntentId(paymentIntentId);
+        orderRepository.save(order);
+    }
+
+    @Transactional
+    public void updateOrderPaymentStatus(String paymentIntentId, OrderStatus status) {
+        Order order = orderRepository.findByPaymentIntentId(paymentIntentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found for payment intent", "ORD-404"));
+        order.addStatusHistory(status);
+        if (status == OrderStatus.PAID) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.finalizeReservation(item.getQuantity());
+            }
+        } else if (status == OrderStatus.REFUNDED) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                product.increaseStock(item.getQuantity());
+            }
+        }
+        orderRepository.save(order);
     }
 
     private void validateStatusTransition(OrderStatus current, OrderStatus next) {
