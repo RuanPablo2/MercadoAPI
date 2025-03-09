@@ -6,6 +6,7 @@ import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -35,4 +36,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByUserId(Long userId, Pageable pageable);
 
     Optional<Order> findByPaymentIntentId(String paymentIntentId);
+
+    @Modifying
+    @Query("UPDATE Order o SET o.paymentIntentId = :paymentIntentId WHERE o.id = :orderId")
+    void updatePaymentIntentId(@Param("orderId") Long orderId, @Param("paymentIntentId") String paymentIntentId);
+
+    @Query("SELECT o FROM Order o JOIN FETCH o.items WHERE o.id = :orderId")
+    Optional<Order> findByIdWithItems(@Param("orderId") Long orderId);
 }

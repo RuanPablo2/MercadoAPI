@@ -17,6 +17,7 @@ import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Refund;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,13 +50,16 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderDTO findByIdAndValidateOwner(Long orderId, CustomUserDetails userDetails) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
         if (userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             if (!order.getUser().getId().equals(userDetails.getId())) {
                 throw new ForbiddenException("You do not have permission to view this order", "ORD-012");
             }
         }
+
+        Hibernate.initialize(order.getItems());
+        Hibernate.initialize(order.getStatusHistory());
         return new OrderDTO(order);
     }
 
@@ -122,19 +126,12 @@ public class OrderService {
         }
 
         if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.PROCESSING) {
-            // Verifica se há um paymentIntentId antes de tentar o reembolso
             if (order.getPaymentIntentId() == null) {
                 throw new PaymentException("Order has no payment intent, refund not possible", "PAY-001");
             }
-
             try {
                 Refund refund = paymentService.refundPayment(order.getPaymentIntentId());
                 order.setRefundId(refund.getId());
-
-                // Repoe o estoque
-                for (OrderItem item : order.getItems()) {
-                    item.getProduct().increaseStock(item.getQuantity());
-                }
             } catch (PaymentException e) {
                 throw new PaymentException("Failed to refund payment", "PAY-002", e);
             }
