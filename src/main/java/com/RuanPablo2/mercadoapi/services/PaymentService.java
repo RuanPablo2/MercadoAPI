@@ -3,6 +3,8 @@ package com.RuanPablo2.mercadoapi.services;
 import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.PaymentIntentResponse;
 import com.RuanPablo2.mercadoapi.entities.Order;
+import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
+import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import com.RuanPablo2.mercadoapi.exception.ForbiddenException;
 import com.RuanPablo2.mercadoapi.exception.PaymentException;
 import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
@@ -53,6 +55,10 @@ public class PaymentService {
 
             if (!order.getUser().getId().equals(userDetails.getId())) {
                 throw new ForbiddenException("You do not have permission to pay for this order", "ORD-012");
+            }
+
+            if (!OrderStatus.PENDING.equals(order.getCurrentStatus())) {
+                throw new BusinessException("Order is not ready for payment. Please complete the checkout first.", "ORD-014");
             }
 
             BigDecimal total = order.getTotal();
