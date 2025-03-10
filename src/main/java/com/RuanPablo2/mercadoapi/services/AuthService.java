@@ -114,6 +114,10 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(ResetPasswordRequestDTO requestDTO) {
+        if (!requestDTO.getNewPassword().equals(requestDTO.getConfirmPassword())) {
+            throw new BusinessException("Passwords do not match", "RST-003");
+        }
+
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(requestDTO.getToken())
                 .orElseThrow(() -> new BusinessException("Invalid or expired token", "RST-001"));
 
