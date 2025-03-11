@@ -12,7 +12,15 @@ API REST para gestão de pedidos e pagamentos, com autenticação segura, contro
 - **Envio de e-mails** (SMTP, reset de senha)
 - **Docker + Railway** (Deploy em produção)
 
-## 🌐 Deploy em Produção
+## 🚀 Deploy Automatizado com CI/CD
+
+O deploy da API foi automatizado utilizando uma esteira de CI/CD, garantindo que cada nova versão seja testada e enviada para produção sem complicações. O pipeline inclui:
+
+Testes antes do deploy, garantindo a estabilidade do código.
+Build e deploy automáticos via GitHub CI.
+Infraestrutura em Docker para facilitar a replicação do ambiente.
+Hospedagem no Railway, com integração contínua para atualizar a aplicação automaticamente.
+Isso permite que novas funcionalidades sejam lançadas rapidamente, mantendo a confiabilidade e escalabilidade do sistema. 🚀
 
 A API está hospedada no Railway:
 
