@@ -69,14 +69,6 @@ public class OrderController {
         return ResponseEntity.ok(orderDTO);
     }
 
-    @PutMapping("/{orderId}/confirm-payment")
-    @PreAuthorize("hasRole('ROLE_CLIENT')")
-    public ResponseEntity<OrderDTO> confirmPayment(@PathVariable Long orderId, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        OrderDTO orderDTO = orderService.confirmPayment(orderId, userDetails.getId());
-        return ResponseEntity.ok(orderDTO);
-    }
-
     @PutMapping("/{orderId}/checkout")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
     public ResponseEntity<OrderDTO> checkout(@PathVariable Long orderId, Authentication authentication) {
