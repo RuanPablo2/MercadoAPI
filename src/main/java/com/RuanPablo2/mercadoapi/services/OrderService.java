@@ -217,30 +217,6 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDTO confirmPayment(Long orderId, Long userId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
-
-        if (!order.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("This order does not belong to you", "ORD-008");
-        }
-
-        if (order.getCurrentStatus() != OrderStatus.PENDING) {
-            throw new OrderStatusException("Order is not in PENDING status", "ORD-010");
-        }
-
-        order.addStatusHistory(OrderStatus.PAID);
-
-        for (OrderItem item : order.getItems()) {
-            Product product = item.getProduct();
-            product.finalizeReservation(item.getQuantity());
-        }
-
-        orderRepository.save(order);
-        return new OrderDTO(order);
-    }
-
-    @Transactional
     public OrderDTO checkout(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
