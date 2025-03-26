@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/","/api/auth/**", "/h2-console/**", "/api/webhooks/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs", "/api-docs/**", "/api-docs").permitAll()
+                        .requestMatchers("/", "/api", "/api/auth/**", "/h2-console/**", "/api/webhooks/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs", "/api-docs/**", "/api-docs").permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
