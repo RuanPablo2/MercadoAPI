@@ -8,6 +8,8 @@ import com.RuanPablo2.mercadoapi.dtos.response.LoginResponseDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
 import com.RuanPablo2.mercadoapi.services.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,21 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest, HttpServletResponse response) {
         try {
-            LoginResponseDTO response = authService.login(loginRequest);
-            return ResponseEntity.ok(response);
+            LoginResponseDTO loginResponse = authService.login(loginRequest);
+
+            Cookie jwtCookie = new Cookie("jwt", loginResponse.getToken());
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(false);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(24 * 60 * 60);
+
+            response.addCookie(jwtCookie);
+
+            loginResponse.setToken(null);
+            return ResponseEntity.ok(loginResponse);
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
