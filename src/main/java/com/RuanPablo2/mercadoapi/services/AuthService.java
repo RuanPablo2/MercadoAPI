@@ -6,6 +6,7 @@ import com.RuanPablo2.mercadoapi.dtos.request.ResetPasswordRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.LoginResponseDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.UserDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.UserRegistrationDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.UserSessionDTO;
 import com.RuanPablo2.mercadoapi.entities.PasswordResetToken;
 import com.RuanPablo2.mercadoapi.entities.User;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
@@ -15,6 +16,8 @@ import com.RuanPablo2.mercadoapi.repositories.PasswordResetTokenRepository;
 import com.RuanPablo2.mercadoapi.repositories.UserRepository;
 import com.RuanPablo2.mercadoapi.security.CustomUserDetails;
 import com.RuanPablo2.mercadoapi.security.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -77,6 +80,15 @@ public class AuthService {
         }
     }
 
+    public void logout(HttpServletResponse response) {
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(false);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0);
+        response.addCookie(jwtCookie);
+    }
+
     public UserDTO register(UserRegistrationDTO userRegistrationDTO, boolean isAdminCreating) {
         if (userService.findByEmail(userRegistrationDTO.getEmail()).isPresent()) {
             throw new BusinessException("Email already registered", "USR-001");
@@ -130,5 +142,14 @@ public class AuthService {
         userRepository.save(user);
 
         passwordResetTokenRepository.delete(resetToken);
+    }
+
+    public UserSessionDTO getCurrentUser(CustomUserDetails userDetails) {
+        return new UserSessionDTO(
+                userDetails.getId(),
+                userDetails.getName(),
+                userDetails.getEmail(),
+                userDetails.getRole()
+        );
     }
 }
