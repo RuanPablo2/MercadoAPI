@@ -217,6 +217,64 @@ public class OrderService {
     }
 
     @Transactional
+    public OrderDTO decreaseItemQuantity(Long orderId, Long productId, int quantity, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new ForbiddenException("This order does not belong to you", "ORD-008");
+        }
+
+        if (order.getCurrentStatus() != OrderStatus.CART) {
+            throw new OrderStatusException("Order is not in CART status", "ORD-009");
+        }
+
+        OrderItem item = order.getItems().stream()
+                .filter(i -> i.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found in cart", "PRD-404"));
+
+        if (item.getQuantity() < quantity) {
+            throw new BusinessException("Cannot decrease more than current quantity", "ORD-013");
+        }
+
+        item.setQuantity(item.getQuantity() - quantity);
+        item.getProduct().releaseReservedStock(quantity);
+
+        if (item.getQuantity() == 0) {
+            order.getItems().remove(item);
+        }
+
+        orderRepository.save(order);
+        return new OrderDTO(order);
+    }
+
+    @Transactional
+    public OrderDTO removeItemFromCart(Long orderId, Long productId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new ForbiddenException("This order does not belong to you", "ORD-008");
+        }
+
+        if (order.getCurrentStatus() != OrderStatus.CART) {
+            throw new OrderStatusException("Order is not in CART status", "ORD-009");
+        }
+
+        OrderItem item = order.getItems().stream()
+                .filter(i -> i.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found in cart", "PRD-404"));
+
+        item.getProduct().releaseReservedStock(item.getQuantity());
+        order.getItems().remove(item);
+
+        orderRepository.save(order);
+        return new OrderDTO(order);
+    }
+
+    @Transactional
     public OrderDTO checkout(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));

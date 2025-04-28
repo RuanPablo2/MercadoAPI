@@ -69,6 +69,27 @@ public class OrderController {
         return ResponseEntity.ok(orderDTO);
     }
 
+    @PatchMapping("/{orderId}/items/{itemId}/decrease")
+    public ResponseEntity<OrderDTO> decreaseItemQuantity(
+            @PathVariable Long orderId,
+            @PathVariable Long itemId,
+            @RequestParam int quantity,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO updatedOrder = orderService.decreaseItemQuantity(orderId, itemId, quantity, userDetails.getId());
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @DeleteMapping("/{orderId}/items/{itemId}")
+    public ResponseEntity<OrderDTO> removeItem(
+            @PathVariable Long orderId,
+            @PathVariable Long itemId,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        OrderDTO updatedOrder = orderService.removeItemFromCart(orderId, itemId, userDetails.getId());
+        return ResponseEntity.ok(updatedOrder);
+    }
+
     @PutMapping("/{orderId}/checkout")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
     public ResponseEntity<OrderDTO> checkout(@PathVariable Long orderId, Authentication authentication) {
