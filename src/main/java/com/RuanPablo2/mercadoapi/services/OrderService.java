@@ -112,6 +112,10 @@ public class OrderService {
 
         OrderStatus currentStatus = order.getCurrentStatus();
 
+        if (currentStatus == OrderStatus.CART) {
+            throw new OrderStatusException("Cart orders cannot be canceled. Please use 'empty cart' instead.", "ORD-015");
+        }
+
         if (currentStatus == OrderStatus.CANCELED || currentStatus == OrderStatus.COMPLETED || currentStatus == OrderStatus.OUT_FOR_DELIVERY) {
             throw new OrderStatusException("Order cannot be canceled", "ORD-003");
         }
@@ -120,8 +124,8 @@ public class OrderService {
             if (!order.getUser().getEmail().equals(userEmail)) {
                 throw new ForbiddenException("You cannot cancel orders that are not yours", "ORD-004");
             }
-            if (!(currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.PROCESSING)) {
-                throw new OrderStatusException("Clients can only cancel orders in CART, PENDING or PROCESSING status", "ORD-005");
+            if (!(currentStatus == OrderStatus.PENDING || currentStatus == OrderStatus.PROCESSING)) {
+                throw new OrderStatusException("Clients can only cancel orders in PENDING or PROCESSING status", "ORD-005");
             }
         }
 
@@ -138,7 +142,7 @@ public class OrderService {
 
             order.addStatusHistory(OrderStatus.REFUNDED);
         } else {
-            if (currentStatus == OrderStatus.CART || currentStatus == OrderStatus.PENDING) {
+            if (currentStatus == OrderStatus.PENDING) {
                 for (OrderItem item : order.getItems()) {
                     item.getProduct().releaseReservedStock(item.getQuantity());
                 }
@@ -304,11 +308,26 @@ public class OrderService {
     }
 
     @Transactional
-    public void savePaymentIntentId(Long orderId, String paymentIntentId) {
+    public OrderDTO emptyCart(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
-        order.setPaymentIntentId(paymentIntentId);
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new ForbiddenException("This order does not belong to you", "ORD-008");
+        }
+
+        if (order.getCurrentStatus() != OrderStatus.CART) {
+            throw new OrderStatusException("Only carts can be emptied", "ORD-014");
+        }
+
+        for (OrderItem item : order.getItems()) {
+            item.getProduct().releaseReservedStock(item.getQuantity());
+        }
+
+        order.getItems().clear();
         orderRepository.save(order);
+
+        return new OrderDTO(order);
     }
 
     @Transactional

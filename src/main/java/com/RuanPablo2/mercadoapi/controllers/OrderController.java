@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -102,6 +103,13 @@ public class OrderController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long orderId, @RequestBody @Valid OrderStatusUpdateRequestDTO request) {
         OrderDTO orderDTO = orderService.updateOrderStatus(orderId, request);
+        return ResponseEntity.ok(orderDTO);
+    }
+
+    @PutMapping("/{orderId}/empty-cart")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<OrderDTO> emptyCart(@PathVariable Long orderId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        OrderDTO orderDTO = orderService.emptyCart(orderId, userDetails.getId());
         return ResponseEntity.ok(orderDTO);
     }
 
