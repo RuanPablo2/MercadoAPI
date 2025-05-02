@@ -30,21 +30,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest, HttpServletResponse response) {
         try {
-            LoginResponseDTO loginResponse = authService.login(loginRequest);
-
-            Cookie jwtCookie = new Cookie("jwt", loginResponse.getToken());
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setSecure(false);
-            jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(24 * 60 * 60);
-
-            response.addCookie(jwtCookie);
-
-            loginResponse.setToken(null);
+            LoginResponseDTO loginResponse = authService.login(loginRequest, response);
             return ResponseEntity.ok(loginResponse);
-
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 

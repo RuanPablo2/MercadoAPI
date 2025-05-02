@@ -58,7 +58,7 @@ public class AuthService {
     @Autowired
     private EmailService emailService;
 
-    public LoginResponseDTO login(LoginRequestDTO loginRequest) {
+    public LoginResponseDTO login(LoginRequestDTO loginRequest, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
@@ -68,13 +68,20 @@ public class AuthService {
 
             String jwt = jwtUtil.generateToken(userDetails.getEmail(), userDetails.getRole().toString());
 
-            LoginResponseDTO response = new LoginResponseDTO();
-            response.setToken(jwt);
-            response.setUserId(userDetails.getId());
-            response.setName(userDetails.getName());
-            response.setEmail(userDetails.getEmail());
+            Cookie jwtCookie = new Cookie("jwt", jwt);
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(false);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(24 * 60 * 60);
+            response.addCookie(jwtCookie);
 
-            return response;
+            LoginResponseDTO responseDTO = new LoginResponseDTO();
+            responseDTO.setUserId(userDetails.getId());
+            responseDTO.setName(userDetails.getName());
+            responseDTO.setEmail(userDetails.getEmail());
+
+            return responseDTO;
+
         } catch (AuthenticationException e) {
             throw new UnauthorizedException("Invalid username or password", "AUTH-001", e);
         }
