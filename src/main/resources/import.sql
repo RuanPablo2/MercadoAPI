@@ -89,5 +89,4 @@ INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (8, 'P
 INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (9, 'PENDING', '2024-01-23 08:20:00');
 INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (9, 'PROCESSING', '2024-01-23 08:25:00');
 INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (9, 'OUT_FOR_DELIVERY', '2024-01-23 08:30:00');
-INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (10, 'PENDING', '2024-01-22 17:00:00');
-INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (10, 'CANCELED', '2024-01-22 17:25:00');
+INSERT INTO tb_order_status_history (order_id, status, updated_at) VALUES (10, 'CART', '2024-01-22 17:00:00');
