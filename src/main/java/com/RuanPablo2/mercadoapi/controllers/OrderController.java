@@ -46,6 +46,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Authentication authentication) {
+
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderSummaryDTO> ordersPage = orderService.findByUserId(userDetails.getId(), pageable);

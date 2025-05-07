@@ -49,6 +49,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    public Page<OrderSummaryDTO> findByUserId(Long userId, Pageable pageable) {
+        return orderRepository
+                .findByUserIdAndCurrentStatusNotOrderByCreatedAtDesc(userId, OrderStatus.CART, pageable)
+                .map(OrderSummaryDTO::new);
+    }
+
+    @Transactional(readOnly = true)
     public OrderDTO findByIdAndValidateOwner(Long orderId, CustomUserDetails userDetails) {
         Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
@@ -61,11 +68,6 @@ public class OrderService {
         Hibernate.initialize(order.getItems());
         Hibernate.initialize(order.getStatusHistory());
         return new OrderDTO(order);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<OrderSummaryDTO> findByUserId(Long userId, Pageable pageable) {
-        return orderRepository.findByUserId(userId, pageable).map(OrderSummaryDTO::new);
     }
 
     @Transactional
