@@ -1,6 +1,6 @@
 package com.RuanPablo2.mercadoapi.entities;
 
-import com.RuanPablo2.mercadoapi.dtos.request.ProductDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ProductRequestDTO;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,7 +46,7 @@ public class Product {
         this.reservedQuantity = 0;
     }
 
-    public Product(ProductDTO dto) {
+    public Product(ProductRequestDTO dto) {
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.price = dto.getPrice();
@@ -54,7 +54,7 @@ public class Product {
         this.reservedQuantity = 0;
     }
 
-    public void updateData(ProductDTO dto) {
+    public void updateData(ProductRequestDTO dto) {
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.price = dto.getPrice();

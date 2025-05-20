@@ -1,6 +1,7 @@
 package com.RuanPablo2.mercadoapi.services;
 
-import com.RuanPablo2.mercadoapi.dtos.request.ProductDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ProductRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.ProductResponseDTO;
 import com.RuanPablo2.mercadoapi.entities.Product;
 import com.RuanPablo2.mercadoapi.exception.BusinessException;
 import com.RuanPablo2.mercadoapi.exception.ResourceNotFoundException;
@@ -19,24 +20,24 @@ public class ProductService {
     @Autowired
     ProductRepository productRepository;
 
-    public Page<ProductDTO> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable).map(ProductDTO::new);
+    public Page<ProductResponseDTO> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable).map(ProductResponseDTO::new);
     }
 
-    public ProductDTO findById(Long id){
+    public ProductResponseDTO findById(Long id){
         Product result = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
-        return new ProductDTO(result);
+        return new ProductResponseDTO(result);
     }
 
     @Transactional
-    public ProductDTO save(ProductDTO dto) {
+    public ProductResponseDTO save(ProductRequestDTO dto) {
         Product product = new Product(dto);
         product = productRepository.save(product);
-        return new ProductDTO(product);
+        return new ProductResponseDTO(product);
     }
 
     @Transactional
-    public ProductDTO update(Long id, ProductDTO dto) {
+    public ProductResponseDTO update(Long id, ProductRequestDTO dto) {
 
         if (dto.getPrice() == null || dto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("Price must be positive", "PRD-VAL");
@@ -49,7 +50,7 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found", "PRD-404"));
         product.updateData(dto);
-        return new ProductDTO(productRepository.save(product));
+        return new ProductResponseDTO(productRepository.save(product));
     }
 
     @Transactional

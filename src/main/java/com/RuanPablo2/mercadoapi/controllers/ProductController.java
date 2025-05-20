@@ -1,6 +1,7 @@
 package com.RuanPablo2.mercadoapi.controllers;
 
-import com.RuanPablo2.mercadoapi.dtos.request.ProductDTO;
+import com.RuanPablo2.mercadoapi.dtos.request.ProductRequestDTO;
+import com.RuanPablo2.mercadoapi.dtos.response.ProductResponseDTO;
 import com.RuanPablo2.mercadoapi.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,32 +21,32 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Page<ProductDTO>> findAll(
+    public ResponseEntity<Page<ProductResponseDTO>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ProductDTO> productsPage = productService.findAll(pageable);
+        Page<ProductResponseDTO> productsPage = productService.findAll(pageable);
         return ResponseEntity.ok(productsPage);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
-        ProductDTO productDTO = productService.findById(id);
-        return ResponseEntity.ok(productDTO);
+    public ResponseEntity<ProductResponseDTO> findById(@PathVariable Long id) {
+        ProductResponseDTO productResponseDTO = productService.findById(id);
+        return ResponseEntity.ok(productResponseDTO);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
-    public ResponseEntity<ProductDTO> save(@Valid @RequestBody ProductDTO dto) {
-        ProductDTO productDTO = productService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
+    public ResponseEntity<ProductResponseDTO> save(@Valid @RequestBody ProductRequestDTO dto) {
+        ProductResponseDTO productResponseDTO = productService.save(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDTO);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO dto) {
-        ProductDTO productDTO = productService.update(id, dto);
-        return ResponseEntity.ok(productDTO);
+    public ResponseEntity<ProductResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ProductRequestDTO dto) {
+        ProductResponseDTO productResponseDTO = productService.update(id, dto);
+        return ResponseEntity.ok(productResponseDTO);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

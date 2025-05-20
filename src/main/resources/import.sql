@@ -36,7 +36,7 @@ INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf)
 -- product
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Arroz', 'Pacote de 5kg', 25.90, 50, 'Alimentos', 'img1.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Feijao', 'Pacote de 1kg', 8.90, 40, 'Alimentos', 'img2.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Oleo de Soja', 'Garrafa de 900ml', 7.50, 30, 'Alimentos', 'img3.jpg');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Oleo de Soja', 'Garrafa de 900ml', 7.50, 0, 'Alimentos', 'img3.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Leite', 'Caixa 1L', 4.80, 60, 'Laticinios', 'img4.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Pao de Forma', 'Pao 500g', 6.20, 20, 'Padaria', 'img5.jpg');
 INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Detergente', '500ml', 2.30, 100, 'Limpeza', 'img6.jpg');

@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ProductDTO {
+public class ProductRequestDTO {
 
     private Long id;
 
@@ -35,7 +35,7 @@ public class ProductDTO {
 
     private String image;
 
-    public ProductDTO(Product entity){
+    public ProductRequestDTO(Product entity){
         BeanUtils.copyProperties(entity, this);
     }
 }
