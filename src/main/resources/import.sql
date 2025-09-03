@@ -34,16 +34,16 @@ INSERT INTO tb_user (name, email, password, address_id, phone_number, role, cpf)
 --gabriel987
 
 -- product
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Arroz', 'Pacote de 5kg', 25.90, 50, 'Alimentos', 'img1.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Feijao', 'Pacote de 1kg', 8.90, 40, 'Alimentos', 'img2.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Oleo de Soja', 'Garrafa de 900ml', 7.50, 0, 'Alimentos', 'img3.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Leite', 'Caixa 1L', 4.80, 60, 'Laticinios', 'img4.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Pao de Forma', 'Pao 500g', 6.20, 20, 'Padaria', 'img5.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Detergente', '500ml', 2.30, 100, 'Limpeza', 'img6.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Sabao em Po', '1kg', 10.50, 35, 'Limpeza', 'img7.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Refrigerante', 'Garrafa 2L', 9.00, 25, 'Bebidas', 'img8.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Cerveja', 'Lata 350ml', 3.50, 80, 'Bebidas', 'img9.jpg');
-INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Chocolate', 'Barra 90g', 5.80, 45, 'Doces', 'img10.jpg');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Arroz', 'Pacote de 5kg', 25.90, 50, 'Alimentos', 'https://images.tcdn.com.br/img/img_prod/1299377/arroz_tipo_1_namorado_5kg_varejo_1_unidade_469_1_a1f6db21da7284e456faecaedbf17f86.jpg');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Feijao', 'Pacote de 1kg', 8.90, 40, 'Alimentos', 'https://redemix.vteximg.com.br/arquivos/ids/209460-1000-1000/7897136400155.jpg?v=638350604534800000');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Oleo de Soja', 'Garrafa de 900ml', 7.50, 0, 'Alimentos', 'https://carrefourbrfood.vtexassets.com/arquivos/ids/211616/141836_1.jpg?v=637272514200130000');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Leite', 'Caixa 1L', 4.80, 60, 'Laticinios', 'https://superprix.vteximg.com.br/arquivos/ids/208297/7898215151708--1-.jpg?v=637916015363630000');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Pao de Forma', 'Pao 500g', 6.20, 20, 'Padaria', 'https://www.davo.com.br/ccstore/v1/images/?source=/file/v6927418914476199480/products/prod_7891203010056.imagem1.jpg&height=940&width=940');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Detergente', '500ml', 2.30, 100, 'Limpeza', 'https://images.tcdn.com.br/img/img_prod/880282/detergente_neutro_ype_500_ml_1059_1_6858b320c10f7e389fefdf0efd780951.jpg');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Sabao em Po', '1kg', 10.50, 35, 'Limpeza', 'https://www.davo.com.br/ccstore/v1/images/?source=/file/v1666961323739904815/products/prod_7891150086456.imagem1.jpg&height=940&width=940');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Refrigerante', 'Garrafa 2L', 9.00, 25, 'Bebidas', 'https://www.extramercado.com.br/img/uploads/1/913/24935913.jpg');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Cerveja', 'Lata 350ml', 3.50, 80, 'Bebidas', 'https://bretas.vtexassets.com/arquivos/ids/202752/65730c89dddb07d995cdb4a0.jpg?v=638376354703500000');
+INSERT INTO tb_product (name, description, price, stock_quantity, category, image_url) VALUES ('Chocolate', 'Barra 90g', 5.80, 45, 'Doces', 'https://cdn.awsli.com.br/1030/1030675/produto/41309256/53982f7b86.jpg');
 
 -- ORDER
 INSERT INTO tb_order (user_id, created_at) VALUES (2, '2024-02-02 10:00:00');
