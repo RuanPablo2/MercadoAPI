@@ -1,13 +1,11 @@
 package com.RuanPablo2.mercadoapi.services;
 
+import com.RuanPablo2.mercadoapi.dtos.request.CheckoutRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderItemRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.OrderSummaryDTO;
-import com.RuanPablo2.mercadoapi.entities.Order;
-import com.RuanPablo2.mercadoapi.entities.OrderItem;
-import com.RuanPablo2.mercadoapi.entities.Product;
-import com.RuanPablo2.mercadoapi.entities.User;
+import com.RuanPablo2.mercadoapi.entities.*;
 import com.RuanPablo2.mercadoapi.entities.enums.OrderStatus;
 import com.RuanPablo2.mercadoapi.entities.enums.Role;
 import com.RuanPablo2.mercadoapi.exception.*;
@@ -281,7 +279,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDTO checkout(Long orderId, Long userId) {
+    public OrderDTO checkout(Long orderId, Long userId, CheckoutRequestDTO checkoutRequest) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "ORD-404"));
 
@@ -303,6 +301,9 @@ public class OrderService {
                 throw new StockException("Insufficient stock available for product: " + product.getName(), "STK-001");
             }
         }
+
+        Address shippingAddress = new Address(checkoutRequest.getShippingAddress());
+        order.setShippingAddress(shippingAddress);
 
         order.addStatusHistory(OrderStatus.PENDING);
         orderRepository.save(order);

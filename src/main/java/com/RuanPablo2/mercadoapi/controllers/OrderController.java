@@ -1,5 +1,6 @@
 package com.RuanPablo2.mercadoapi.controllers;
 
+import com.RuanPablo2.mercadoapi.dtos.request.CheckoutRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.response.OrderDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderStatusUpdateRequestDTO;
 import com.RuanPablo2.mercadoapi.dtos.request.OrderItemRequestDTO;
@@ -94,9 +95,9 @@ public class OrderController {
 
     @PutMapping("/{orderId}/checkout")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
-    public ResponseEntity<OrderDTO> checkout(@PathVariable Long orderId, Authentication authentication) {
+    public ResponseEntity<OrderDTO> checkout(@PathVariable Long orderId, @RequestBody @Valid CheckoutRequestDTO checkoutRequest, Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        OrderDTO orderDTO = orderService.checkout(orderId, userDetails.getId());
+        OrderDTO orderDTO = orderService.checkout(orderId, userDetails.getId(), checkoutRequest);
         return ResponseEntity.ok(orderDTO);
     }
 
